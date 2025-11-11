@@ -1,0 +1,18 @@
+Step 1: Install URP via the Package Manager
+Open your Unity project.
+Go to Window > Package Manager.
+In the Package Manager, search for Universal RP or Universal Render Pipeline.
+Click Install.
+Step 2: Set up the Universal Render Pipeline
+In the Project window, right-click and go to Create > Rendering > Universal Render Pipeline > Pipeline Asset.
+Name it (e.g., "URP_Pipeline").
+Then, go to Edit > Project Settings > Graphics.
+In the Scriptable Render Pipeline Settings field, assign the URP Pipeline asset you just created.
+Step 3: Upgrade Materials to URP
+In Edit > Render Pipeline > Universal Render Pipeline, choose Upgrade Project Materials to UniversalRP Materials.
+This will convert all your materials to URP-compatible versions.
+If needed, you can convert specific materials by right-clicking them in the Project window and selecting Convert Selected Materials to UniversalRP.
+Step 4: Adjust Lighting & Post Processing (optional)
+URP uses different lighting and post-processing systems than Built-In, so you may need to adjust your lighting setup and add a Post-Processing Volume.
+For post-processing, you'll need to install Post Processing from the Package Manager and add it to your URP pipeline settings.
+Once you've completed these steps, your project and materials should now be compatible with the URP!

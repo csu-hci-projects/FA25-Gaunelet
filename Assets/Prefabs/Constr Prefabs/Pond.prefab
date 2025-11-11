@@ -1,0 +1,811 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2781143205427263937
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3781084323317925200}
+  - component: {fileID: 8728418639710619308}
+  m_Layer: 0
+  m_Name: Pond
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3781084323317925200
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2781143205427263937}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6125967358811858569}
+  - {fileID: 4601475177751729586}
+  - {fileID: 3030550642498926372}
+  - {fileID: 5769821800827487276}
+  - {fileID: 9044576737327680222}
+  - {fileID: 1536406371971024148}
+  - {fileID: 2407947424860697063}
+  - {fileID: 6027835437275826787}
+  - {fileID: 4767207060171727737}
+  - {fileID: 3454388680469179902}
+  - {fileID: 7270894123729163682}
+  - {fileID: 7871210075467546010}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!65 &8728418639710619308
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2781143205427263937}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 156.32, y: 3.26, z: 111.3}
+  m_Center: {x: 11.3, y: 0, z: 64.6}
+--- !u!1001 &122245001795209880
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3781084323317925200}
+    m_Modifications:
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 32.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798083831691634570, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_Name
+      value: Large Water Tile (9)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+--- !u!4 &3454388680469179902 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+  m_PrefabInstance: {fileID: 122245001795209880}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &309786151879053378
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3781084323317925200}
+    m_Modifications:
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 77.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -40.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798083831691634570, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_Name
+      value: Large Water Tile (2)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+--- !u!4 &3030550642498926372 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+  m_PrefabInstance: {fileID: 309786151879053378}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1092270730672838273
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3781084323317925200}
+    m_Modifications:
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -39.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -4.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798083831691634570, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_Name
+      value: Large Water Tile (6)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+--- !u!4 &2407947424860697063 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+  m_PrefabInstance: {fileID: 1092270730672838273}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1268185880968278740
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3781084323317925200}
+    m_Modifications:
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 38.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -40.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798083831691634570, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_Name
+      value: Large Water Tile (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+--- !u!4 &4601475177751729586 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+  m_PrefabInstance: {fileID: 1268185880968278740}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &4255990063711003250
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3781084323317925200}
+    m_Modifications:
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -4.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798083831691634570, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_Name
+      value: Large Water Tile (5)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+--- !u!4 &1536406371971024148 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+  m_PrefabInstance: {fileID: 4255990063711003250}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &4863358464574561020
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3781084323317925200}
+    m_Modifications:
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 77.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 32.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798083831691634570, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_Name
+      value: Large Water Tile (11)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+--- !u!4 &7871210075467546010 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+  m_PrefabInstance: {fileID: 4863358464574561020}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5378809454210249412
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3781084323317925200}
+    m_Modifications:
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 39.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 32.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798083831691634570, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_Name
+      value: Large Water Tile (10)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+--- !u!4 &7270894123729163682 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+  m_PrefabInstance: {fileID: 5378809454210249412}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &6036780093441928632
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3781084323317925200}
+    m_Modifications:
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 37.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -4.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798083831691634570, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_Name
+      value: Large Water Tile (4)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+--- !u!4 &9044576737327680222 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+  m_PrefabInstance: {fileID: 6036780093441928632}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7812263820971852831
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3781084323317925200}
+    m_Modifications:
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -39.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 32.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798083831691634570, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_Name
+      value: Large Water Tile (8)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+--- !u!4 &4767207060171727737 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+  m_PrefabInstance: {fileID: 7812263820971852831}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &8881652372937540079
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3781084323317925200}
+    m_Modifications:
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -40.44
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798083831691634570, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_Name
+      value: Large Water Tile
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+--- !u!4 &6125967358811858569 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+  m_PrefabInstance: {fileID: 8881652372937540079}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &9071680634509503749
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3781084323317925200}
+    m_Modifications:
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -39.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -40.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798083831691634570, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_Name
+      value: Large Water Tile (7)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+--- !u!4 &6027835437275826787 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+  m_PrefabInstance: {fileID: 9071680634509503749}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &9101985155145032522
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 3781084323317925200}
+    m_Modifications:
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 77.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -4.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8798083831691634570, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+      propertyPath: m_Name
+      value: Large Water Tile (3)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+--- !u!4 &5769821800827487276 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3333289473422976870, guid: 3eebf28e1129ead4e9e37bd03c914207, type: 3}
+  m_PrefabInstance: {fileID: 9101985155145032522}
+  m_PrefabAsset: {fileID: 0}
