@@ -9,98 +9,123 @@ public class GoblinAI : MonoBehaviour
     [SerializeField] private float waitTimeAtPoint = 2f;
     [SerializeField] private float reachDistance = 0.5f;
     [SerializeField] private float rotationOffset = 180f;
-    
+
+    [Header("Combat Settings")]
+    [SerializeField] private Transform player;
+    [SerializeField] private float chaseRange = 8f;
+    [SerializeField] private float attackRange = 2f;
+    [SerializeField] private float attackCooldown = 1.5f;
+
     private NavMeshAgent agent;
     private Animator animator;
+
     private int currentPatrolIndex = 0;
     private float waitTimer = 0f;
     private bool isWaiting = false;
+    private float attackTimer = 0f;
+    private bool isChasing = false;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        
+
         if (agent == null)
         {
             Debug.LogError("NavMeshAgent component missing on " + gameObject.name);
             return;
         }
-        
-        if (animator == null)
-        {
-            Debug.LogWarning("Animator component missing on " + gameObject.name);
-        }
-        
+
         if (patrolPoints.Length == 0)
         {
             Debug.LogWarning("No patrol points assigned to " + gameObject.name);
             return;
         }
-        
+
         agent.speed = patrolSpeed;
-        agent.updateRotation = false; // We'll handle rotation manually
-        
+        agent.updateRotation = false;
+
         GoToNextPatrolPoint();
     }
 
     void Update()
     {
-        if (patrolPoints.Length == 0 || agent == null) return;
-        
-        Patrol();
+        if (agent == null) return;
+
+        attackTimer += Time.deltaTime;
+
+        float distanceToPlayer = player != null ? Vector3.Distance(transform.position, player.position) : Mathf.Infinity;
+
+        if (distanceToPlayer <= attackRange)
+        {
+            AttackPlayer();
+        }
+        else if (distanceToPlayer <= chaseRange)
+        {
+            ChasePlayer();
+        }
+        else
+        {
+            Patrol();
+        }
+
         HandleRotation();
         UpdateAnimation();
     }
-    
-    void UpdateAnimation()
+
+    void AttackPlayer()
+{
+    // Stop moving instantly
+    agent.isStopped = true;
+    agent.velocity = Vector3.zero; // prevents lingering motion
+
+    // Face the player immediately
+    Vector3 dir = (player.position - transform.position).normalized;
+    if (dir.sqrMagnitude > 0.001f)
     {
-        if (animator == null) return;
-        
-        // Set speed parameter based on agent velocity
-        float speed = agent.velocity.magnitude;
-        animator.SetFloat("Speed", speed);
-        
-        // Also set a bool for more reliable transitions
-        bool isMoving = speed > 0.1f && !isWaiting;
-        animator.SetBool("IsWalking", isMoving);
-        
-        // Debug to see what speed values we're getting
-        if (Time.frameCount % 30 == 0) // Log every 30 frames
-        {
-            Debug.Log($"Goblin speed: {speed:F2}, Is waiting: {isWaiting}, IsWalking: {isMoving}");
-        }
+        Quaternion targetRot = Quaternion.LookRotation(dir) * Quaternion.Euler(0, rotationOffset, 0);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 10f);
     }
-    
-    void HandleRotation()
+
+    // Attack instantly when in range
+    if (attackTimer >= attackCooldown)
     {
-        if (agent.velocity.sqrMagnitude > 0.1f)
-        {
-            Vector3 direction = agent.velocity.normalized;
-            Quaternion targetRotation = Quaternion.LookRotation(direction);
-            targetRotation *= Quaternion.Euler(0, rotationOffset, 0);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
-        }
+        attackTimer = 0f;
+        animator.ResetTrigger("Attack"); // ensure clean trigger
+        animator.SetTrigger("Attack");
+
+        // Optional: immediately set walking to false so it snaps out of locomotion
+        animator.SetBool("IsWalking", false);
+    }
+}
+
+    void ChasePlayer()
+    {
+        // isChasing = true;
+        isWaiting = false;
+        agent.isStopped = false;
+        agent.SetDestination(player.position);
     }
 
     void Patrol()
     {
+        // isChasing = false;
+
         if (isWaiting)
         {
-            agent.isStopped = true; // Force stop during wait
+            agent.isStopped = true;
             waitTimer += Time.deltaTime;
-            
+
             if (waitTimer >= waitTimeAtPoint)
             {
                 isWaiting = false;
                 waitTimer = 0f;
-                agent.isStopped = false; // Resume movement
+                agent.isStopped = false;
                 GoToNextPatrolPoint();
             }
             return;
         }
-        
-        // Check if we have a valid path and are close to destination
+
         if (agent.hasPath && !agent.pathPending && agent.remainingDistance <= reachDistance)
         {
             isWaiting = true;
@@ -110,30 +135,36 @@ public class GoblinAI : MonoBehaviour
     void GoToNextPatrolPoint()
     {
         if (patrolPoints.Length == 0) return;
-        
+
         agent.SetDestination(patrolPoints[currentPatrolIndex].position);
         currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
     }
 
-    // Visualization in Scene view
+    void HandleRotation()
+    {
+        if (agent.velocity.sqrMagnitude > 0.1f && !agent.isStopped)
+        {
+            Vector3 direction = agent.velocity.normalized;
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            targetRotation *= Quaternion.Euler(0, rotationOffset, 0);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
+        }
+    }
+
+    void UpdateAnimation()
+    {
+        if (animator == null) return;
+
+        float speed = agent.velocity.magnitude;
+        animator.SetFloat("Speed", speed);
+        animator.SetBool("IsWalking", speed > 0.1f && !agent.isStopped);
+    }
+
     void OnDrawGizmosSelected()
     {
-        if (patrolPoints == null || patrolPoints.Length == 0) return;
-        
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
         Gizmos.color = Color.yellow;
-        
-        for (int i = 0; i < patrolPoints.Length; i++)
-        {
-            if (patrolPoints[i] != null)
-            {
-                Gizmos.DrawWireSphere(patrolPoints[i].position, 0.3f);
-                
-                int nextIndex = (i + 1) % patrolPoints.Length;
-                if (patrolPoints[nextIndex] != null)
-                {
-                    Gizmos.DrawLine(patrolPoints[i].position, patrolPoints[nextIndex].position);
-                }
-            }
-        }
+        Gizmos.DrawWireSphere(transform.position, chaseRange);
     }
 }
