@@ -21,6 +21,9 @@ public class PlayerControls : MonoBehaviour
     public float blockMoveSpeedMultiplier = 0.3f; // Slow down movement while blocking
     private bool isBlocking = false;
 
+    // References
+    private PlayerState playerState;
+
     // Animator parameter names
     private const string IS_WALKING = "IsWalking";
     private const string IS_BLOCKING = "IsBlocking";
@@ -33,6 +36,13 @@ public class PlayerControls : MonoBehaviour
         rb.freezeRotation = true;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
 
+        // Get PlayerState component
+        playerState = GetComponent<PlayerState>();
+        if (playerState == null)
+        {
+            Debug.LogError("PlayerControls: PlayerState component not found!");
+        }
+
         if (modelTransform != null)
             animator = modelTransform.GetComponent<Animator>();
         else
@@ -43,6 +53,12 @@ public class PlayerControls : MonoBehaviour
     {
         // --- Block Input ---
         isBlocking = Input.GetMouseButton(1); // Right mouse button held down
+        
+        // Tell PlayerState about blocking state
+        if (playerState != null)
+        {
+            playerState.SetBlocking(isBlocking);
+        }
         
         if (animator != null)
         {

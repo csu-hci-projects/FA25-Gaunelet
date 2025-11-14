@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-public class GoblinAI : MonoBehaviour
+// GoblinAI now implements the IDamageable interface
+public class GoblinAI : MonoBehaviour, IDamageable
 {
     [Header("Patrol Settings")]
     [SerializeField] private Transform[] patrolPoints;
@@ -15,15 +16,25 @@ public class GoblinAI : MonoBehaviour
     [SerializeField] private float chaseRange = 8f;
     [SerializeField] private float attackRange = 2f;
     [SerializeField] private float attackCooldown = 1.5f;
+    [SerializeField] private float attackDamage = 10f;
+    [SerializeField] private float attackDelay = 0.4f; // Time delay to sync damage with animation
+
+    [Header("Goblin Stats")]
+    [SerializeField] private float maxHP = 50f;
+    [SerializeField] private float currentHP = 50f;
+
+    [Header("Death Settings")]
+    [SerializeField] private float deathDestroyDelay = 2f; // Time before destroying after death
 
     private NavMeshAgent agent;
     private Animator animator;
+    private PlayerState playerState;
 
     private int currentPatrolIndex = 0;
     private float waitTimer = 0f;
     private bool isWaiting = false;
     private float attackTimer = 0f;
-    private bool isChasing = false;
+    private bool isDead = false;
 
     void Start()
     {
@@ -39,18 +50,33 @@ public class GoblinAI : MonoBehaviour
         if (patrolPoints.Length == 0)
         {
             Debug.LogWarning("No patrol points assigned to " + gameObject.name);
-            return;
+        }
+
+        // Get PlayerState component from player (REQUIRED)
+        if (player != null)
+        {
+            playerState = player.GetComponent<PlayerState>();
+            if (playerState == null)
+            {
+                Debug.LogError("PlayerState component not found on player! Goblin cannot attack.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Player Transform not assigned to " + gameObject.name);
         }
 
         agent.speed = patrolSpeed;
         agent.updateRotation = false;
+
+        currentHP = maxHP;
 
         GoToNextPatrolPoint();
     }
 
     void Update()
     {
-        if (agent == null) return;
+        if (agent == null || isDead) return;
 
         attackTimer += Time.deltaTime;
 
@@ -58,7 +84,7 @@ public class GoblinAI : MonoBehaviour
 
         if (distanceToPlayer <= attackRange)
         {
-            AttackPlayer();
+            TryAttackPlayer(); 
         }
         else if (distanceToPlayer <= chaseRange)
         {
@@ -73,35 +99,45 @@ public class GoblinAI : MonoBehaviour
         UpdateAnimation();
     }
 
-    void AttackPlayer()
-{
-    // Stop moving instantly
-    agent.isStopped = true;
-    agent.velocity = Vector3.zero; // prevents lingering motion
-
-    // Face the player immediately
-    Vector3 dir = (player.position - transform.position).normalized;
-    if (dir.sqrMagnitude > 0.001f)
+    // Function that checks cooldown and triggers attack animation
+    void TryAttackPlayer()
     {
-        Quaternion targetRot = Quaternion.LookRotation(dir) * Quaternion.Euler(0, rotationOffset, 0);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 10f);
-    }
+        // Stop moving instantly
+        agent.isStopped = true;
+        agent.velocity = Vector3.zero;
 
-    // Attack instantly when in range
-    if (attackTimer >= attackCooldown)
+        // Face the player
+        Vector3 dir = (player.position - transform.position).normalized;
+        if (dir.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRot = Quaternion.LookRotation(dir) * Quaternion.Euler(0, rotationOffset, 0);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 10f);
+        }
+
+        // Attack when cooldown is ready
+        if (attackTimer >= attackCooldown)
+        {
+            attackTimer = 0f;
+            animator.SetTrigger("Attack");
+            animator.SetBool("IsWalking", false);
+            
+            // DELAY DAMAGE APPLICATION to sync with animation impact
+            Invoke(nameof(DealDamageToPlayer), attackDelay); 
+        }
+    }
+    
+    // Function that deals damage (called by Invoke)
+    void DealDamageToPlayer()
     {
-        attackTimer = 0f;
-        animator.ResetTrigger("Attack"); // ensure clean trigger
-        animator.SetTrigger("Attack");
-
-        // Optional: immediately set walking to false so it snaps out of locomotion
-        animator.SetBool("IsWalking", false);
+        // Check if the player is still alive before dealing damage
+        if (playerState != null && playerState.IsAlive())
+        {
+            playerState.TakeDamage(attackDamage);
+        }
     }
-}
 
     void ChasePlayer()
     {
-        // isChasing = true;
         isWaiting = false;
         agent.isStopped = false;
         agent.SetDestination(player.position);
@@ -109,8 +145,6 @@ public class GoblinAI : MonoBehaviour
 
     void Patrol()
     {
-        // isChasing = false;
-
         if (isWaiting)
         {
             agent.isStopped = true;
@@ -167,4 +201,53 @@ public class GoblinAI : MonoBehaviour
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, chaseRange);
     }
+
+    // --- IDamageable Implementation ---
+
+    public void TakeDamage(float damage)
+    {
+        if (isDead) return;
+
+        currentHP -= damage;
+        Debug.Log($"[Goblin] -{damage}HP | Current HP: {currentHP}/{maxHP}");
+
+        if (currentHP <= 0)
+        {
+            currentHP = 0;
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        if (isDead) return;
+
+        isDead = true;
+        Debug.Log($"[Goblin] {gameObject.name} has died!");
+
+        // Stop all AI behavior
+        agent.isStopped = true;
+        agent.velocity = Vector3.zero;
+
+        // Disable collider
+        Collider col = GetComponent<Collider>();
+        if (col != null)
+        {
+            col.enabled = false;
+        }
+
+        // Trigger death animation
+        if (animator != null)
+        {
+            animator.SetTrigger("Death");
+        }
+
+        // Destroy after delay to allow animation to play
+        Destroy(gameObject, deathDestroyDelay);
+    }
+
+    // Public getters required by IDamageable
+    public bool IsAlive() => currentHP > 0;
+    public float GetCurrentHP() => currentHP;
+    public float GetMaxHP() => maxHP;
 }

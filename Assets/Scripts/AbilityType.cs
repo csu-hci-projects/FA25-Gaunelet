@@ -1,0 +1,1 @@
+public enum AbilityType { Fire, Ice, Invincible, Light }
