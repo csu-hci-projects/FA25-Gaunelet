@@ -7,7 +7,6 @@ public class GauntletAbilities : MonoBehaviour
 {
     [Header("Ability Settings")]
     public float invincibilityDuration = 3f;
-    // NEW: Magic drain rate (per second) for channeled spells
     public float magicDrainRate = 10f; 
 
     [Header("Ability Availability Toggles")]
@@ -16,11 +15,13 @@ public class GauntletAbilities : MonoBehaviour
     public bool isInvincibleEnabled = true;
     public bool isLightEnabled = false; 
 
-    [Header("VFX References")]
-    public ParticleSystem spellEmitter; // Used for Fire/Ice
-    public ParticleSystem lightEmitter; // Dedicated emitter for Light
+    [Header("VFX Emitters")] // RENAMED HEADER
+    public ParticleSystem fireEmitter; // NEW DEDICATED EMITTER
+    public ParticleSystem iceEmitter;  // NEW DEDICATED EMITTER
+    public ParticleSystem lightEmitter; // Existing dedicated emitter
 
     [Header("VFX Materials")]
+    // We keep these for consistency/future use, but the material is set on the emitters themselves now.
     public Material fireMaterial;
     public Material iceMaterial;
     public Material lightMaterial; 
@@ -30,13 +31,13 @@ public class GauntletAbilities : MonoBehaviour
     public Material invincibleMaterial; 
     
     private PlayerState playerState;
-    private Renderer spellEmitterRenderer; 
+    // We no longer need spellEmitterRenderer
+    // private Renderer spellEmitterRenderer; 
     
     private Material originalPlayerMaterial; 
     
     private bool gauntletActive = false;
     private AbilityType currentAbility = AbilityType.Fire; 
-    // NEW: Tracks if a continuous spell is currently running
     private bool isCasting = false; 
 
     private float invincibilityEndTime = 0f;
@@ -45,20 +46,19 @@ public class GauntletAbilities : MonoBehaviour
     {
         playerState = GetComponent<PlayerState>();
         
-        if (spellEmitter != null)
-        {
-            spellEmitterRenderer = spellEmitter.GetComponent<Renderer>();
-        }
+        // Removed spellEmitterRenderer setup
         
         if (playerRenderer != null)
         {
             originalPlayerMaterial = playerRenderer.material;
         }
+
+        // Ensure all emitters start stopped and disabled.
+        StopAllEmitters(true);
     }
 
     void Start()
     {
-        // Initialize the starting ability state in Start()
         EnsureCurrentAbilityIsEnabled(true);
     }
 
@@ -66,10 +66,9 @@ public class GauntletAbilities : MonoBehaviour
     {
         gauntletActive = Input.GetMouseButton(1); 
 
-        // 1. Ability Cycling (E key) - Independent of Gauntlet Mode
+        // 1. Ability Cycling (E key)
         if (Input.GetKeyDown(KeyCode.E))
         {
-            // Stop casting if cycling in the middle of a channeled spell
             if (isCasting) StopCast(); 
             CycleAbility();
         }
@@ -77,12 +76,12 @@ public class GauntletAbilities : MonoBehaviour
         // 2. Channeled Casting Input Logic (ONLY runs if Gauntlet is Active)
         if (gauntletActive)
         {
-            // START CASTING: LMB Pressed Down (must not be casting, be a channeled spell, and not be invincible)
+            // START CASTING: LMB Pressed Down
             if (Input.GetMouseButtonDown(0) && !isCasting && currentAbility != AbilityType.Invincible && !playerState.IsInvincible())
             {
                 StartCast();
             }
-            // STOP CASTING: LMB Released OR if we release the gauntlet while casting (handled below)
+            // STOP CASTING: LMB Released
             else if (Input.GetMouseButtonUp(0) && isCasting)
             {
                 StopCast();
@@ -113,7 +112,20 @@ public class GauntletAbilities : MonoBehaviour
         }
     }
 
-    // NEW: Function to handle magic drain and checks while casting
+    // NEW HELPER: Stops all emitters and optionally disables the GameObjects
+    void StopAllEmitters(bool disableObjects = false)
+    {
+        fireEmitter?.Stop();
+        iceEmitter?.Stop();
+        lightEmitter?.Stop();
+
+        if (disableObjects)
+        {
+            // It's safer to disable the particle system component or its parent if needed, 
+            // but just stopping playback is often sufficient for channeled effects.
+        }
+    }
+
     void HandleContinuousCast()
     {
         float magicToDrain = magicDrainRate * Time.deltaTime;
@@ -130,12 +142,10 @@ public class GauntletAbilities : MonoBehaviour
         }
     }
 
-    // NEW: Handles the initial click to start the channeled spell
     void StartCast()
     {
         if (!IsAbilityEnabled(currentAbility) || currentAbility == AbilityType.Invincible) return;
 
-        // Require at least 1 frame's worth of magic to start
         if (playerState.GetCurrentMagic() < magicDrainRate * Time.deltaTime) 
         {
             Debug.Log("[Gauntlet] Not enough magic to start cast!");
@@ -148,11 +158,11 @@ public class GauntletAbilities : MonoBehaviour
         {
             case AbilityType.Fire:
                 Debug.Log("[Gauntlet] Fire Channel START!");
-                spellEmitter?.Play();
+                fireEmitter?.Play(); // PLAY DEDICATED EMITTER
                 break;
             case AbilityType.Ice:
                 Debug.Log("[Gauntlet] Ice Channel START!");
-                spellEmitter?.Play();
+                iceEmitter?.Play(); // PLAY DEDICATED EMITTER
                 break;
             case AbilityType.Light:
                 Debug.Log("[Gauntlet] Light Channel START!");
@@ -161,18 +171,14 @@ public class GauntletAbilities : MonoBehaviour
         }
     }
 
-    // NEW: Handles the stop/release of the channeled spell
     void StopCast()
     {
         isCasting = false;
-
-        spellEmitter?.Stop();
-        lightEmitter?.Stop();
+        StopAllEmitters(); // Use the new helper function
 
         Debug.Log($"[Gauntlet] {currentAbility} Channel STOP!");
     }
 
-    // Invincible uses this one-shot trigger now
     void TryActivateAbility()
     {
         if (currentAbility == AbilityType.Invincible && IsAbilityEnabled(currentAbility))
@@ -181,7 +187,6 @@ public class GauntletAbilities : MonoBehaviour
         }
     }
 
-    // --- Helper methods (unchanged) ---
     private bool IsAbilityEnabled(AbilityType ability)
     {
         return ability switch
@@ -257,30 +262,27 @@ public class GauntletAbilities : MonoBehaviour
         Debug.LogWarning("[Gauntlet] No available ability to switch to!");
     }
     
+    // MODIFIED: Simplified to only handle visual setup/cleanup, no material swap needed
     void ApplySpellVisuals(AbilityType ability, bool force = false)
     {
         if (!gauntletActive && !force) return;
 
-        spellEmitter?.Stop();
-        lightEmitter?.Stop();
+        StopAllEmitters(); // Ensure all are stopped before potentially activating one for visual setup
 
-        if (ability == AbilityType.Fire || ability == AbilityType.Ice)
+        // Now we just ensure the correct emitter's material is set on its renderer if needed
+        // (Though ideally, the material is set on the prefab/object itself for Fire/Ice/Light)
+        
+        if (ability == AbilityType.Fire)
         {
-            if (spellEmitterRenderer != null)
-            {
-                spellEmitterRenderer.material = (ability == AbilityType.Fire) ? fireMaterial : iceMaterial;
-            }
+            // Fire setup code here (if needed)
+        }
+        else if (ability == AbilityType.Ice)
+        {
+            // Ice setup code here (if needed)
         }
         else if (ability == AbilityType.Light)
         {
-            if (lightEmitter != null)
-            {
-                 Renderer lightRenderer = lightEmitter.GetComponent<Renderer>();
-                 if (lightRenderer != null && lightRenderer.material != lightMaterial)
-                 {
-                      lightRenderer.material = lightMaterial;
-                 }
-            }
+            // Light setup code here (if needed)
         }
     }
     
