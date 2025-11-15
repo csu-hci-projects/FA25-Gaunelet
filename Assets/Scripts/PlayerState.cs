@@ -2,64 +2,67 @@ using UnityEngine;
 
 public class PlayerState : MonoBehaviour, IDamageable
 {
-    // AbilityType is now defined elsewhere
-
-    [Header("Player Stats")]
+    [Header("Health & Magic Stats")]
     [SerializeField] private float maxHP = 100f;
     [SerializeField] private float currentHP = 100f;
     [SerializeField] private float maxMagic = 100f;
     [SerializeField] private float currentMagic = 100f;
 
-    [Header("Damage Settings")]
-    [SerializeField] private float invulnerabilityDuration = 0.5f; // Prevent damage spam
-    private float lastDamageTime = -999f;
+    [Header("Regeneration Settings")]
+    [SerializeField] private float magicRegenRate = 5f; 
+    [SerializeField] private float blockDamageReduction = 0.5f; // New: 50% damage reduction when blocking
 
-    [Header("State")]
-    private bool isBlocking = false;
-    private bool isInvincible = false; // Dedicated Invincible state
-
-    [Header("Block Settings")]
-    [SerializeField] private float blockDamageReduction = 0f; // 0 = no damage, 0.3 = 30% damage taken
+    private bool isInvincible = false;
+    private bool isBlocking = false; 
 
     void Start()
     {
         currentHP = maxHP;
         currentMagic = maxMagic;
+        Debug.Log($"[PlayerState] Initialized. HP: {currentHP}/{maxHP} | Magic: {currentMagic}/{maxMagic}");
     }
 
-    // REMOVED: Update() and SwitchAbility() for ability cycling
+    void Update()
+    {
+        RegenerateMagic();
+    }
+
+    void RegenerateMagic()
+    {
+        float magicToRestore = magicRegenRate * Time.deltaTime;
+        
+        if (currentMagic < maxMagic)
+        {
+             currentMagic = Mathf.Clamp(currentMagic + magicToRestore, 0f, maxMagic);
+             // Debug.Log($"[PlayerState: Magic] Gained {magicToRestore:F2} | Current: {currentMagic:F2}/{maxMagic}");
+        }
+    }
+
+    // --- HP Methods (IDamageable Implementation) ---
 
     public void TakeDamage(float damage)
     {
-        // 1. Invincibility Check (Highest priority)
         if (isInvincible)
         {
-            Debug.Log("[PlayerState] Totally Invincible! No damage taken.");
+            Debug.Log("[PlayerState: HP] Invincible! Damage blocked.");
             return;
         }
-
-        // 2. Invulnerability Frame Check
-        if (Time.time - lastDamageTime < invulnerabilityDuration)
-        {
-            return;
-        }
-
-        // 3. Block Reduction Check
+        
+        // 1. Apply Block Reduction Logic
+        float finalDamage = damage;
         if (isBlocking)
         {
-            damage *= blockDamageReduction;
-            if (damage <= 0)
-            {
-                Debug.Log("[PlayerState] BLOCKED! No damage taken");
-                return;
-            }
-            Debug.Log($"[PlayerState] BLOCKED! Reduced damage to {damage}");
+            finalDamage *= blockDamageReduction;
+            Debug.Log($"[PlayerState: HP] Blocking! Reduced {damage:F2} damage to {finalDamage:F2}.");
         }
+        
+        // Ensure damage is positive before applying
+        finalDamage = Mathf.Max(0, finalDamage); 
 
-        currentHP -= damage;
-        lastDamageTime = Time.time;
-
-        Debug.Log($"[PlayerState] -{damage}HP | Current HP: {currentHP}/{maxHP}");
+        currentHP -= finalDamage;
+        
+        // CRITICAL HP DAMAGE DEBUG
+        Debug.Log($"[PlayerState: HP] Took **-{finalDamage:F2}** | Current HP: {currentHP:F2}/{maxHP}");
 
         if (currentHP <= 0)
         {
@@ -67,51 +70,47 @@ public class PlayerState : MonoBehaviour, IDamageable
             Die();
         }
     }
-
-    public void Heal(float amount)
+    // ... (Die, Magic Methods, Getter/Setters are the same)
+    
+    void Die()
     {
-        currentHP = Mathf.Min(currentHP + amount, maxHP);
-        Debug.Log($"[PlayerState] +{amount}HP | Current HP: {currentHP}/{maxHP}");
+        Debug.Log("[PlayerState: HP] **Player has died!**");
+        // TODO: Add death animation, disable controls, reload scene, etc.
     }
+
+    // --- Magic Methods ---
 
     public void UseMagic(float amount)
     {
-        if (currentMagic >= amount)
+        float previousMagic = currentMagic;
+        currentMagic = Mathf.Clamp(currentMagic - amount, 0f, maxMagic);
+        
+        if (currentMagic < previousMagic)
         {
-            currentMagic -= amount;
-            Debug.Log($"[PlayerState] -{amount} Magic | Current Magic: {currentMagic}/{maxMagic}");
+            Debug.Log($"[PlayerState: Magic] Used {amount:F2} | Current: {currentMagic:F2}/{maxMagic}");
         }
     }
 
-    public void RestoreMagic(float amount)
-    {
-        currentMagic = Mathf.Min(currentMagic + amount, maxMagic);
-        Debug.Log($"[PlayerState] +{amount} Magic | Current Magic: {currentMagic}/{maxMagic}");
-    }
+    // --- Getter/Setter Methods ---
 
-    void Die()
-    {
-        Debug.Log("[PlayerState] Player has died!");
-        // Add death logic here (animation, respawn, game over, etc.)
-    }
-
-    // Public Getters
+    public bool IsAlive() => currentHP > 0;
     public float GetCurrentHP() => currentHP;
     public float GetMaxHP() => maxHP;
     public float GetCurrentMagic() => currentMagic;
     public float GetMaxMagic() => maxMagic;
-    public bool IsAlive() => currentHP > 0;
 
-    // State Control (called by PlayerControls and GauntletAbilities)
-    public void SetBlocking(bool blocking)
+    public void SetInvincible(bool status)
     {
-        isBlocking = blocking;
+        isInvincible = status;
+        Debug.Log($"[PlayerState: Status] Invincible set to: {status}");
     }
-    public bool IsBlocking() => isBlocking;
 
-    public void SetInvincible(bool invincible)
-    {
-        isInvincible = invincible;
-    }
     public bool IsInvincible() => isInvincible;
+
+    public void SetBlocking(bool status)
+    {
+        isBlocking = status;
+    }
+
+    public bool IsBlocking() => isBlocking;
 }

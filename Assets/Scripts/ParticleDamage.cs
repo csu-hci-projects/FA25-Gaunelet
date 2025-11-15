@@ -1,36 +1,45 @@
 using UnityEngine;
 
+// Assuming the IDamageable interface is defined in your project
 public class ParticleDamage : MonoBehaviour
 {
     [Header("Damage Settings")]
     public float damagePerParticle = 0.1f; 
 
-    // This function is called by the Unity Particle System component when a particle 
-    // collides with a GameObject that has a Collider.
     void OnParticleCollision(GameObject other)
     {
-        // Start by assuming the component is on the hit object (since the collider is on the root)
-        GoblinAI goblin = other.GetComponent<GoblinAI>();
+        IDamageable damageable = null;
 
-        // If the particle hit a child object's collider, the component might be on the parent/root.
-        // We use GetComponentInParent which searches the hit object and its ancestors.
-        if (goblin == null)
+        // 1. Try to get a direct component (GoblinAI or SpiderAI)
+        // Check for the GoblinAI component (on the hit object or its parents)
+        if (damageable == null)
         {
-            goblin = other.GetComponentInParent<GoblinAI>();
+            GoblinAI goblin = other.GetComponent<GoblinAI>();
+            if (goblin == null)
+            {
+                goblin = other.GetComponentInParent<GoblinAI>();
+            }
+            if (goblin != null) damageable = goblin;
+        }
+        
+        // 2. Check for the SpiderAI component (if not already found)
+        if (damageable == null)
+        {
+            SpiderAI spider = other.GetComponent<SpiderAI>();
+            if (spider == null)
+            {
+                spider = other.GetComponentInParent<SpiderAI>();
+            }
+            if (spider != null) damageable = spider;
         }
 
-        if (goblin != null)
+        // 3. Apply damage universally if a damageable entity was found
+        if (damageable != null)
         {
-            // Apply damage only if the component is found
-            goblin.TakeDamage(damagePerParticle);
+            damageable.TakeDamage(damagePerParticle);
             
             // Optional: Debug confirmation
-            Debug.Log($"[ParticleDamage] Applied {damagePerParticle} damage to Goblin.");
-        }
-        else
-        {
-            // Debugging: See what the particle is hitting that ISN'T the goblin
-            // Debug.Log($"Particle hit non-target: {other.name}");
+            Debug.Log($"[ParticleDamage] Applied {damagePerParticle} damage to {other.name}.");
         }
     }
 }
