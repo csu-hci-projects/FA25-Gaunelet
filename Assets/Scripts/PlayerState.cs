@@ -91,6 +91,18 @@ public class PlayerState : MonoBehaviour, IDamageable
         }
     }
 
+    public void Heal(float amount)
+    {
+        currentHP = Mathf.Clamp(currentHP + amount, 0f, maxHP);
+        Debug.Log($"[PlayerState: HP] Healed +{amount}HP | Current HP: {currentHP:F2}/{maxHP}");
+    }
+
+    public void RestoreMagic(float amount)
+    {
+        currentMagic = Mathf.Clamp(currentMagic + amount, 0f, maxMagic);
+        Debug.Log($"[PlayerState: Magic] Restored +{amount}MP | Current Magic: {currentMagic:F2}/{maxMagic}");
+    }
+
     // --- Getter/Setter Methods ---
 
     public bool IsAlive() => currentHP > 0;
