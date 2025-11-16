@@ -1,45 +1,37 @@
 using UnityEngine;
 
-// Assuming the IDamageable interface is defined in your project
 public class ParticleDamage : MonoBehaviour
 {
     [Header("Damage Settings")]
     public float damagePerParticle = 0.1f; 
 
+    // Player tag defined for exclusion
+    private const string PLAYER_TAG = "Player"; 
+
     void OnParticleCollision(GameObject other)
     {
-        IDamageable damageable = null;
-
-        // 1. Try to get a direct component (GoblinAI or SpiderAI)
-        // Check for the GoblinAI component (on the hit object or its parents)
-        if (damageable == null)
+        // 1. EXCLUSION CHECK: If the particle hits the player object, skip damage.
+        if (other.CompareTag(PLAYER_TAG))
         {
-            GoblinAI goblin = other.GetComponent<GoblinAI>();
-            if (goblin == null)
-            {
-                goblin = other.GetComponentInParent<GoblinAI>();
-            }
-            if (goblin != null) damageable = goblin;
+            return; 
         }
         
-        // 2. Check for the SpiderAI component (if not already found)
+        // Use IDamageable interface to check for any enemy
+        IDamageable damageable = null;
+
+        // 2. Check for IDamageable on the hit object
+        damageable = other.GetComponent<IDamageable>();
+        
+        // 3. Check for IDamageable on the parent object (for child colliders/limbs)
         if (damageable == null)
         {
-            SpiderAI spider = other.GetComponent<SpiderAI>();
-            if (spider == null)
-            {
-                spider = other.GetComponentInParent<SpiderAI>();
-            }
-            if (spider != null) damageable = spider;
+            damageable = other.GetComponentInParent<IDamageable>();
         }
 
-        // 3. Apply damage universally if a damageable entity was found
+        // 4. Apply damage if a damageable entity (enemy) was found
         if (damageable != null)
         {
             damageable.TakeDamage(damagePerParticle);
-            
-            // Optional: Debug confirmation
-            Debug.Log($"[ParticleDamage] Applied {damagePerParticle} damage to {other.name}.");
         }
     }
 }

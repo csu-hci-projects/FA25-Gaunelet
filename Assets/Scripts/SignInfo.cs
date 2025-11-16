@@ -4,7 +4,6 @@ using TMPro;
 public class SignInfo : MonoBehaviour
 {
     // === MODIFIED: Private constant string defined in code ===
-    // This value cannot be changed in the Inspector
     private const string SIGN_MESSAGE = "Four forest objects are needed to advance to the cult dungeon!\n\n1. Southeast: Bush\n2. Southwest: Stump\n3. Northwest: Mushroom\n4. Northeast: You will figure it out... FIGHT!";
     // =========================================================
 
@@ -13,6 +12,47 @@ public class SignInfo : MonoBehaviour
     public TextMeshProUGUI displayText; 
 
     private bool isTextShowing = false;
+    private bool isPlayerInRange = false;
+
+    // The tag used to identify the player object
+    private const string PLAYER_TAG = "Player"; 
+
+    // --- Interaction Logic ---
+    
+    void Update()
+    {
+        // 1. Check for the Space key press ONLY if the player is within the trigger range
+        if (isPlayerInRange && Input.GetKeyDown(KeyCode.Space))
+        {
+            ToggleTextDisplay();
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        // Check if the object entering the trigger is the player
+        if (other.CompareTag(PLAYER_TAG))
+        {
+            isPlayerInRange = true;
+            // You could add logic here to show a small "Press Space" prompt to the player
+            Debug.Log("Player entered sign range. Press Space to read.");
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        // Check if the object exiting the trigger is the player
+        if (other.CompareTag(PLAYER_TAG))
+        {
+            isPlayerInRange = false;
+            // Force the UI closed when the player walks away.
+            HideText();
+            // You could add logic here to hide the small "Press Space" prompt
+            Debug.Log("Player left sign range.");
+        }
+    }
+
+    // --- UI Management Methods ---
 
     public void ToggleTextDisplay()
     {
@@ -27,12 +67,13 @@ public class SignInfo : MonoBehaviour
         
         if (isTextShowing)
         {
-            // Set the text using the private constant
+            // Set the text using the private constant and activate the panel
             displayText.text = SIGN_MESSAGE;
             displayPanel.SetActive(true);
         }
         else
         {
+            // Deactivate the panel
             displayPanel.SetActive(false);
         }
     }
@@ -40,8 +81,10 @@ public class SignInfo : MonoBehaviour
     // Method to force the UI closed when the player walks away.
     public void HideText()
     {
+        // Only proceed if the panel reference is set
         if (displayPanel != null)
         {
+            // Only deactivate if it's currently active
             if (displayPanel.activeSelf)
             {
                 displayPanel.SetActive(false);
