@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &8607646740179237374
+--- !u!1001 &8916433835273750774
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -66,7 +66,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 622dfe6cbe6bf144cb3d01ba0282c0e7, type: 2}
     - target: {fileID: 919132149155446097, guid: e6b070634da492a48a576974248d64b9, type: 3}
       propertyPath: m_Name
-      value: Wolfboss_A
+      value: Beast
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -74,30 +74,30 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e6b070634da492a48a576974248d64b9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3533354461774365811}
+      addedObject: {fileID: 848962843010183903}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e6b070634da492a48a576974248d64b9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1595348721693214853}
+      addedObject: {fileID: 8205445295460426301}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e6b070634da492a48a576974248d64b9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2127410942104601892}
+      addedObject: {fileID: 5776772268306055509}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e6b070634da492a48a576974248d64b9, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 9209378025839826457}
+      addedObject: {fileID: 8444083240233991205}
   m_SourcePrefab: {fileID: 100100000, guid: e6b070634da492a48a576974248d64b9, type: 3}
---- !u!1 &8914286996971816111 stripped
+--- !u!1 &8610003449775994279 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e6b070634da492a48a576974248d64b9, type: 3}
-  m_PrefabInstance: {fileID: 8607646740179237374}
+  m_PrefabInstance: {fileID: 8916433835273750774}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &3533354461774365811
+--- !u!95 &848962843010183903
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8914286996971816111}
+  m_GameObject: {fileID: 8610003449775994279}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 0e829f3a7b5005b448b372ae97292672, type: 2}
@@ -112,13 +112,13 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!65 &1595348721693214853
+--- !u!65 &8205445295460426301
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8914286996971816111}
+  m_GameObject: {fileID: 8610003449775994279}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -133,13 +133,13 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.66, y: 6.64, z: 8.89}
   m_Center: {x: 1.34, y: 0, z: -0.19}
---- !u!114 &2127410942104601892
+--- !u!114 &5776772268306055509
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8914286996971816111}
+  m_GameObject: {fileID: 8610003449775994279}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2fc3ad995c79fb249934b9f4a91877ab, type: 3}
@@ -159,13 +159,13 @@ MonoBehaviour:
   maxHP: 120
   currentHP: 120
   deathDestroyDelay: 7
---- !u!195 &9209378025839826457
+--- !u!195 &8444083240233991205
 NavMeshAgent:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8914286996971816111}
+  m_GameObject: {fileID: 8610003449775994279}
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5
