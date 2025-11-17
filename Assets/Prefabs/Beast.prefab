@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e6b070634da492a48a576974248d64b9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 12.948209
+      value: 232.6
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e6b070634da492a48a576974248d64b9, type: 3}
       propertyPath: m_LocalPosition.y
@@ -30,7 +30,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e6b070634da492a48a576974248d64b9, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 79.168175
+      value: -44.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e6b070634da492a48a576974248d64b9, type: 3}
       propertyPath: m_LocalRotation.w
@@ -153,9 +153,9 @@ MonoBehaviour:
   chaseRange: 15
   attackRange: 8
   attackCooldown: 3
-  attackDamage: 30
-  attackDelay: 0.5
-  chaseSpeed: 3
+  attackDamage: 25
+  attackDelay: 1
+  chaseSpeed: 2.5
   maxHP: 120
   currentHP: 120
   deathDestroyDelay: 7

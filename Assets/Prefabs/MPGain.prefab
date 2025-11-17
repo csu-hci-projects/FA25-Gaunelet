@@ -22,15 +22,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6c8f3faefe517b04a8a459b2e554a758, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -4.93
+      value: 245.46
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6c8f3faefe517b04a8a459b2e554a758, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.733
+      value: 0.76
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6c8f3faefe517b04a8a459b2e554a758, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -168.3
+      value: 197.21
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6c8f3faefe517b04a8a459b2e554a758, type: 3}
       propertyPath: m_LocalRotation.w
@@ -38,7 +38,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6c8f3faefe517b04a8a459b2e554a758, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6c8f3faefe517b04a8a459b2e554a758, type: 3}
       propertyPath: m_LocalRotation.y
@@ -146,5 +146,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c243b0221924d1478c6885481c34864, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MPGain
-  magicAmount: 5
+  magicAmount: 8
   respawnTime: 60
