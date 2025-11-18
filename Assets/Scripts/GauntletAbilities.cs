@@ -1,13 +1,14 @@
 using UnityEngine;
-
-// Assuming AbilityType enum now includes Light: public enum AbilityType { Fire, Ice, Invincible, Light } 
+using System; 
 
 [RequireComponent(typeof(PlayerState))]
 public class GauntletAbilities : MonoBehaviour
 {
     [Header("Ability Settings")]
-    public float invincibilityDuration = 3f;
-    public float magicDrainRate = 10f; 
+    public float fireDrainRate = 10f;       
+    public float iceDrainRate = 10f;        
+    public float lightDrainRate = 5f;       
+    public float invincibleDrainRate = 15f; 
 
     [Header("Ability Availability Toggles")]
     public bool isFireEnabled = true;
@@ -15,13 +16,12 @@ public class GauntletAbilities : MonoBehaviour
     public bool isInvincibleEnabled = true;
     public bool isLightEnabled = false; 
 
-    [Header("VFX Emitters")] // RENAMED HEADER
-    public ParticleSystem fireEmitter; // NEW DEDICATED EMITTER
-    public ParticleSystem iceEmitter;  // NEW DEDICATED EMITTER
-    public ParticleSystem lightEmitter; // Existing dedicated emitter
+    [Header("VFX Emitters")]
+    public ParticleSystem fireEmitter; 
+    public ParticleSystem iceEmitter; 
+    public ParticleSystem lightEmitter; 
 
     [Header("VFX Materials")]
-    // We keep these for consistency/future use, but the material is set on the emitters themselves now.
     public Material fireMaterial;
     public Material iceMaterial;
     public Material lightMaterial; 
@@ -31,29 +31,30 @@ public class GauntletAbilities : MonoBehaviour
     public Material invincibleMaterial; 
     
     private PlayerState playerState;
-    // We no longer need spellEmitterRenderer
-    // private Renderer spellEmitterRenderer; 
     
-    private Material originalPlayerMaterial; 
+    // MODIFIED: This now stores the entire array of original materials
+    private Material[] originalPlayerMaterials; 
     
     private bool gauntletActive = false;
     private AbilityType currentAbility = AbilityType.Fire; 
     private bool isCasting = false; 
-
-    private float invincibilityEndTime = 0f;
+    
+    private bool isInvincibleActive = false; 
 
     void Awake()
     {
         playerState = GetComponent<PlayerState>();
         
-        // Removed spellEmitterRenderer setup
-        
         if (playerRenderer != null)
         {
-            originalPlayerMaterial = playerRenderer.material;
+            // NEW: Store the entire array of original materials from the Renderer
+            originalPlayerMaterials = playerRenderer.sharedMaterials;
+        }
+        else
+        {
+             Debug.LogError("Player Renderer not assigned! Invincible visuals will not work.");
         }
 
-        // Ensure all emitters start stopped and disabled.
         StopAllEmitters(true);
     }
 
@@ -70,65 +71,78 @@ public class GauntletAbilities : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E))
         {
             if (isCasting) StopCast(); 
+            if (isInvincibleActive) EndInvincibility(); 
             CycleAbility();
         }
 
-        // 2. Channeled Casting Input Logic (ONLY runs if Gauntlet is Active)
+        // 2. Main Input Logic
         if (gauntletActive)
         {
-            // START CASTING: LMB Pressed Down
-            if (Input.GetMouseButtonDown(0) && !isCasting && currentAbility != AbilityType.Invincible && !playerState.IsInvincible())
+            // --- Channeled Spell Logic (Fire/Ice/Light) ---
+            if (currentAbility != AbilityType.Invincible)
             {
-                StartCast();
+                if (Input.GetMouseButtonDown(0) && !isCasting && !playerState.IsInvincible())
+                {
+                    StartCast();
+                }
+                else if (Input.GetMouseButtonUp(0) && isCasting)
+                {
+                    StopCast();
+                }
             }
-            // STOP CASTING: LMB Released
-            else if (Input.GetMouseButtonUp(0) && isCasting)
+            
+            // --- Invincibility Logic ---
+            if (currentAbility == AbilityType.Invincible)
             {
-                StopCast();
-            }
-            // One-shot ability: Activate Invincible on LMB press
-            else if (Input.GetMouseButtonDown(0) && currentAbility == AbilityType.Invincible && !playerState.IsInvincible())
-            {
-                TryActivateAbility();
-            }
-
-            // Invincibility timer check
-            if (Time.time > invincibilityEndTime && playerState.IsInvincible())
-            {
-                EndInvincibility(); 
+                if (!isInvincibleActive)
+                {
+                    StartInvincibility();
+                }
             }
         }
         
-        // 3. Stop casting if gauntlet is released (RMB released)
-        if (!gauntletActive && isCasting)
+        // 3. Stop all channeled effects if gauntlet is released (RMB released)
+        if (!gauntletActive)
         {
-            StopCast();
+            if (isCasting) StopCast();
+            if (isInvincibleActive) EndInvincibility(); 
         }
-
-        // 4. Handle continuous draining and effects
+        
+        // 4. Handle continuous draining for the active effect
         if (isCasting)
         {
             HandleContinuousCast();
         }
+        
+        if (isInvincibleActive)
+        {
+            HandleInvincibilityDrain();
+        }
     }
 
-    // NEW HELPER: Stops all emitters and optionally disables the GameObjects
+    // --- Core Ability Methods ---
+
     void StopAllEmitters(bool disableObjects = false)
     {
         fireEmitter?.Stop();
         iceEmitter?.Stop();
         lightEmitter?.Stop();
-
-        if (disableObjects)
-        {
-            // It's safer to disable the particle system component or its parent if needed, 
-            // but just stopping playback is often sufficient for channeled effects.
-        }
     }
 
+    float GetCurrentChannelDrainRate()
+    {
+        return currentAbility switch
+        {
+            AbilityType.Fire => fireDrainRate,
+            AbilityType.Ice => iceDrainRate,
+            AbilityType.Light => lightDrainRate,
+            _ => 0f 
+        };
+    }
+    
     void HandleContinuousCast()
     {
-        float magicToDrain = magicDrainRate * Time.deltaTime;
+        float magicToDrain = GetCurrentChannelDrainRate() * Time.deltaTime; 
         
         if (playerState.GetCurrentMagic() > magicToDrain)
         {
@@ -141,12 +155,12 @@ public class GauntletAbilities : MonoBehaviour
             StopCast();
         }
     }
-
+    
     void StartCast()
     {
         if (!IsAbilityEnabled(currentAbility) || currentAbility == AbilityType.Invincible) return;
 
-        if (playerState.GetCurrentMagic() < magicDrainRate * Time.deltaTime) 
+        if (playerState.GetCurrentMagic() < GetCurrentChannelDrainRate() * Time.deltaTime) 
         {
             Debug.Log("[Gauntlet] Not enough magic to start cast!");
             return;
@@ -158,11 +172,11 @@ public class GauntletAbilities : MonoBehaviour
         {
             case AbilityType.Fire:
                 Debug.Log("[Gauntlet] Fire Channel START!");
-                fireEmitter?.Play(); // PLAY DEDICATED EMITTER
+                fireEmitter?.Play(); 
                 break;
             case AbilityType.Ice:
                 Debug.Log("[Gauntlet] Ice Channel START!");
-                iceEmitter?.Play(); // PLAY DEDICATED EMITTER
+                iceEmitter?.Play(); 
                 break;
             case AbilityType.Light:
                 Debug.Log("[Gauntlet] Light Channel START!");
@@ -174,18 +188,75 @@ public class GauntletAbilities : MonoBehaviour
     void StopCast()
     {
         isCasting = false;
-        StopAllEmitters(); // Use the new helper function
+        StopAllEmitters();
 
         Debug.Log($"[Gauntlet] {currentAbility} Channel STOP!");
     }
 
-    void TryActivateAbility()
+    void HandleInvincibilityDrain()
     {
-        if (currentAbility == AbilityType.Invincible && IsAbilityEnabled(currentAbility))
+        float magicToDrain = invincibleDrainRate * Time.deltaTime;
+        
+        if (playerState.GetCurrentMagic() > magicToDrain)
         {
-            StartInvincibility();
+            playerState.UseMagic(magicToDrain);
+        }
+        else
+        {
+            Debug.Log("[Gauntlet] Invincibility Magic ran out! Ending ability.");
+            EndInvincibility();
         }
     }
+
+    // MODIFIED: Sets ALL materials to the invincible material
+    void StartInvincibility()
+    {
+        if (!IsAbilityEnabled(AbilityType.Invincible) || isInvincibleActive) return;
+
+        if (playerState.GetCurrentMagic() < invincibleDrainRate * Time.deltaTime) 
+        {
+             Debug.Log("[Gauntlet] Not enough magic to activate Invincibility!");
+             return;
+        }
+
+        if (playerRenderer != null && invincibleMaterial != null)
+        {
+            // 1. Get the number of materials slots to fill
+            int materialCount = playerRenderer.sharedMaterials.Length;
+            
+            // 2. Create a new array and fill it entirely with the invincible material
+            Material[] newMaterials = new Material[materialCount];
+            for (int i = 0; i < materialCount; i++)
+            {
+                newMaterials[i] = invincibleMaterial;
+            }
+
+            // 3. Apply the new array, visually overriding the entire model
+            playerRenderer.materials = newMaterials;
+        }
+
+        playerState.SetInvincible(true);
+        isInvincibleActive = true;
+        Debug.Log("[Gauntlet] Invincibility activated and draining magic!");
+    }
+
+    // MODIFIED: Restores the ENTIRE array of original materials
+    void EndInvincibility()
+    {
+        if (!isInvincibleActive) return;
+        
+        // Restore the original material array
+        if (playerRenderer != null && originalPlayerMaterials != null)
+        {
+            playerRenderer.materials = originalPlayerMaterials;
+        }
+
+        playerState.SetInvincible(false); 
+        isInvincibleActive = false;
+        Debug.Log("[Gauntlet] Invincibility ended.");
+    }
+    
+    // --- Helper Logic Methods ---
 
     private bool IsAbilityEnabled(AbilityType ability)
     {
@@ -211,7 +282,7 @@ public class GauntletAbilities : MonoBehaviour
             return;
         }
 
-        int maxAttempts = System.Enum.GetValues(typeof(AbilityType)).Length;
+        int maxAttempts = Enum.GetValues(typeof(AbilityType)).Length;
         int startIndex = (int)currentAbility;
         int nextIndex;
 
@@ -236,7 +307,7 @@ public class GauntletAbilities : MonoBehaviour
 
     void CycleAbility()
     {
-        int maxAbilities = System.Enum.GetValues(typeof(AbilityType)).Length;
+        int maxAbilities = Enum.GetValues(typeof(AbilityType)).Length;
         int nextIndex = (int)currentAbility;
         AbilityType previous = currentAbility;
         
@@ -262,50 +333,23 @@ public class GauntletAbilities : MonoBehaviour
         Debug.LogWarning("[Gauntlet] No available ability to switch to!");
     }
     
-    // MODIFIED: Simplified to only handle visual setup/cleanup, no material swap needed
     void ApplySpellVisuals(AbilityType ability, bool force = false)
     {
         if (!gauntletActive && !force) return;
 
-        StopAllEmitters(); // Ensure all are stopped before potentially activating one for visual setup
+        StopAllEmitters(); 
 
-        // Now we just ensure the correct emitter's material is set on its renderer if needed
-        // (Though ideally, the material is set on the prefab/object itself for Fire/Ice/Light)
-        
         if (ability == AbilityType.Fire)
         {
-            // Fire setup code here (if needed)
+             // Fire setup code here (if needed)
         }
         else if (ability == AbilityType.Ice)
         {
-            // Ice setup code here (if needed)
+             // Ice setup code here (if needed)
         }
         else if (ability == AbilityType.Light)
         {
-            // Light setup code here (if needed)
+             // Light setup code here (if needed)
         }
-    }
-    
-    void StartInvincibility()
-    {
-        if (playerRenderer != null && invincibleMaterial != null)
-        {
-            playerRenderer.material = invincibleMaterial;
-        }
-
-        playerState.SetInvincible(true);
-        invincibilityEndTime = Time.time + invincibilityDuration;
-        Debug.Log("[Gauntlet] Invincibility activated!");
-    }
-
-    void EndInvincibility()
-    {
-        if (playerRenderer != null && originalPlayerMaterial != null)
-        {
-            playerRenderer.material = originalPlayerMaterial;
-        }
-
-        playerState.SetInvincible(false); 
-        Debug.Log("[Gauntlet] Invincibility ended.");
     }
 }

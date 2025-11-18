@@ -197,7 +197,7 @@ MonoBehaviour:
   currentHP: 100
   maxMagic: 100
   currentMagic: 100
-  magicRegenRate: 0.35
+  magicRegenRate: 0.45
   blockDamageReduction: 0.3
 --- !u!114 &1024144500870504466
 MonoBehaviour:
