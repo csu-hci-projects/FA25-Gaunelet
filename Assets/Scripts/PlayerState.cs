@@ -12,7 +12,13 @@ public class PlayerState : MonoBehaviour, IDamageable
     [SerializeField] private float magicRegenRate = 5f; 
     [SerializeField] private float blockDamageReduction = 0.5f; // New: 50% damage reduction when blocking
 
-    private bool isInvincible = false;
+    [Header("Temporary Invulnerability Settings")]
+    // The duration the player is immune to damage after being hit
+    [SerializeField] private float damageInvulnerabilityDuration = 0.5f; 
+    private float invulnerabilityTimer = 0f;
+    private bool isDamagedInvulnerable = false; // Tracks the temporary cooldown
+
+    private bool isInvincible = false; // Tracks permanent invincibility (e.g., cheat or power-up)
     private bool isBlocking = false; 
 
     void Start()
@@ -25,6 +31,21 @@ public class PlayerState : MonoBehaviour, IDamageable
     void Update()
     {
         RegenerateMagic();
+        HandleInvulnerabilityTimer(); // NEW: Handle the damage cooldown timer
+    }
+
+    // NEW: Handles the temporary invulnerability after a hit
+    void HandleInvulnerabilityTimer()
+    {
+        if (isDamagedInvulnerable)
+        {
+            invulnerabilityTimer -= Time.deltaTime;
+            if (invulnerabilityTimer <= 0)
+            {
+                isDamagedInvulnerable = false;
+                Debug.Log("[PlayerState: Status] Temporary damage invulnerability ended.");
+            }
+        }
     }
 
     void RegenerateMagic()
@@ -42,13 +63,23 @@ public class PlayerState : MonoBehaviour, IDamageable
 
     public void TakeDamage(float damage)
     {
+        // 1. Check for permanent Invincibility (Highest priority)
         if (isInvincible)
         {
             Debug.Log("[PlayerState: HP] Invincible! Damage blocked.");
             return;
         }
+
+        // 2. Check for temporary Damage Invulnerability (NEW check to stop stacking damage)
+        if (isDamagedInvulnerable)
+        {
+            Debug.Log("[PlayerState: HP] Temporary invulnerability active. Damage blocked.");
+            return;
+        }
         
-        // 1. Apply Block Reduction Logic
+        // --- Damage Application ---
+
+        // 3. Apply Block Reduction Logic
         float finalDamage = damage;
         if (isBlocking)
         {
@@ -59,7 +90,12 @@ public class PlayerState : MonoBehaviour, IDamageable
         // Ensure damage is positive before applying
         finalDamage = Mathf.Max(0, finalDamage); 
 
+        // 4. Apply Damage
         currentHP -= finalDamage;
+        
+        // 5. Start Temporary Invulnerability (Damage Cooldown)
+        isDamagedInvulnerable = true;
+        invulnerabilityTimer = damageInvulnerabilityDuration;
         
         // CRITICAL HP DAMAGE DEBUG
         Debug.Log($"[PlayerState: HP] Took **-{finalDamage:F2}** | Current HP: {currentHP:F2}/{maxHP}");
@@ -70,7 +106,6 @@ public class PlayerState : MonoBehaviour, IDamageable
             Die();
         }
     }
-    // ... (Die, Magic Methods, Getter/Setters are the same)
     
     void Die()
     {
