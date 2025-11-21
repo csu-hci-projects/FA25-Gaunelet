@@ -3,9 +3,16 @@ using TMPro;
 
 public class SignInfo : MonoBehaviour
 {
-    // === MODIFIED: Private constant string defined in code ===
-    private const string SIGN_MESSAGE = "Four forest objects are needed to advance to the cult dungeon!\n\n1. Southeast: Bush\n2. Southwest: Stump\n3. Northwest: Mushroom\n4. Northeast: You will figure it out... FIGHT!";
-    // =========================================================
+    // === MODIFIED: Public field, editable in the Inspector ===
+    [Header("Sign Content")]
+    [TextArea(3, 10)] // Makes the input field multi-line in the Inspector
+    public string signMessage = 
+        "Four forest objects are needed to advance to the cult dungeon!\n" +
+        "Find and active them with the action button (space) to clear the way\n\n" +
+        "1. Southeast: Bush\n" +
+        "2. Southwest: Stump\n" +
+        "3. Northwest: Mushroom\n" +
+        "4. Northeast: You will figure it out... FIGHT!";
 
     [Header("UI References")]
     public GameObject displayPanel; 
@@ -67,8 +74,8 @@ public class SignInfo : MonoBehaviour
         
         if (isTextShowing)
         {
-            // Set the text using the private constant and activate the panel
-            displayText.text = SIGN_MESSAGE;
+            // Set the text using the public variable and activate the panel
+            displayText.text = signMessage;
             displayPanel.SetActive(true);
         }
         else

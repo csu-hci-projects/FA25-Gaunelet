@@ -9,6 +9,12 @@ public class PlayerControls : MonoBehaviour
     [Header("Model & Animator")]
     public Transform modelTransform; // Child with Skinned Mesh + Animator
     private Animator animator;
+    
+    // NEW: Model Offset during Gauntlet Mode
+    [Header("Gauntlet Visual Offset")]
+    // Adjust this value in the Inspector to find the perfect height
+    public float gauntletYOffset = 0.08f; 
+    private Vector3 originalModelLocalPosition; // Store initial position
 
     private Rigidbody rb;
     private Vector3 moveInput;
@@ -41,6 +47,7 @@ public class PlayerControls : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.Interpolate;
 
         // NEW: Define the ground plane at the player's Y level
+        // We set the initial position here, but update it dynamically in Update()
         groundPlane = new Plane(Vector3.up, transform.position);
 
         // Get PlayerState component
@@ -51,13 +58,22 @@ public class PlayerControls : MonoBehaviour
         }
 
         if (modelTransform != null)
+        {
             animator = modelTransform.GetComponent<Animator>();
+            // NEW: Store the initial local position of the model
+            originalModelLocalPosition = modelTransform.localPosition; 
+        }
         else
-            Debug.LogError("PlayerControls: modelTransform is not assigned. Cannot find Animator.");
+        {
+            Debug.LogError("PlayerControls: modelTransform is not assigned. Cannot find Animator or store position.");
+        }
     }
 
     void Update()
     {
+        // Update the ground plane's position dynamically to the current player height
+        groundPlane.SetNormalAndPosition(Vector3.up, transform.position);
+        
         // --- Gauntlet/Block Input ---
         isGauntletMode = Input.GetMouseButton(1); // Right mouse button held down
         
@@ -132,28 +148,75 @@ public class PlayerControls : MonoBehaviour
 
         if (moveDirection.sqrMagnitude > 0.01f)
         {
+            // Set the Rigidbody's velocity directly for immediate, non-physics movement
             rb.linearVelocity = moveDirection * currentSpeed;
         }
         else
         {
             rb.linearVelocity = Vector3.zero;
         }
-
-        // NOTE: targetRotation is set in Update() and applied in LateUpdate()
     }
 
     void LateUpdate()
     {
-        // --- Smooth model rotation ---
-        if (modelTransform != null)
+        if (modelTransform == null) return;
+
+        // 1. ROTATION LOGIC
+        float currentRotationSpeed = isGauntletMode ? aimRotationSpeed : rotationSmoothSpeed;
+        
+        // --- GAUNTLET MODE (Aiming/Blocking) ---
+        if (isGauntletMode)
         {
-            float currentRotationSpeed = isGauntletMode ? aimRotationSpeed : rotationSmoothSpeed;
+            // When aiming, the ROOT object MUST be rotated so abilities fired from the root 
+            // (e.g., GauntletAbilities.cs) use the correct forward vector.
             
+            // Rotate the root object smoothly towards the mouse target
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                targetRotation,
+                currentRotationSpeed * Time.deltaTime
+            );
+            
+            // The model (child) will inherit this rotation. We align the model's local rotation 
+            // to identity to ensure it follows the parent exactly and doesn't introduce double-rotation.
+            modelTransform.localRotation = Quaternion.Slerp(
+                modelTransform.localRotation,
+                Quaternion.identity,
+                currentRotationSpeed * Time.deltaTime
+            );
+        }
+        // --- NORMAL MODE (Walking/Idle) ---
+        else
+        {
+            // When not aiming, the root object remains fixed (rb.freezeRotation is true and we don't set transform.rotation).
+            // Only the child model rotates for visual smoothness.
             modelTransform.rotation = Quaternion.Slerp(
                 modelTransform.rotation,
                 targetRotation,
                 currentRotationSpeed * Time.deltaTime
             );
         }
+
+        // 2. POSITION OFFSET LOGIC (Visual Model Lift)
+        Vector3 targetLocalPosition;
+        const float smoothFactor = 8f; 
+
+        if (isGauntletMode)
+        {
+            // Target position is the original position plus the vertical offset
+            targetLocalPosition = originalModelLocalPosition + new Vector3(0, gauntletYOffset, 0);
+        }
+        else
+        {
+            // Target position is the original local position (no offset)
+            targetLocalPosition = originalModelLocalPosition;
+        }
+
+        // Smoothly move the model to the target local position
+        modelTransform.localPosition = Vector3.Lerp(
+            modelTransform.localPosition, 
+            targetLocalPosition, 
+            smoothFactor * Time.deltaTime
+        );
     }
 }

@@ -17,7 +17,12 @@ public class CultAI : MonoBehaviour, IDamageable
     [SerializeField] private Transform player;
     [SerializeField] private float chaseRange = 12f;  
     [SerializeField] private float attackRange = 8f;   
-    [SerializeField] private float attackCooldown = 3f; 
+    
+    // NEW: Duration the spell will continuously fire (The "window")
+    [SerializeField] private float attackWindowDuration = 3.0f; 
+    // MODIFIED: Duration the enemy must wait after the window ends (The "cooldown")
+    [SerializeField] private float spellCooldownDuration = 1.5f; 
+    
     [SerializeField] private float attackDamage = 25f; 
     [SerializeField] private float attackDelay = 0.5f; // Time from animation trigger to spell launch
     
@@ -39,8 +44,12 @@ public class CultAI : MonoBehaviour, IDamageable
     // NEW: Reference to the projectile script
     private SpellProjectile spellProjectile; 
 
-    private float attackTimer = 0f;
+    // This timer now tracks the time spent in the recovery/cooldown phase
+    private float attackTimer = 0f; 
     private bool isDead = false;
+    private bool isAttackingWindow = false; // NEW STATE: True when the 3s window is active
+
+    // isAnimatorFrozen is now managed only by the Attack Window state
     private bool isAnimatorFrozen = false; 
 
     void Start()
@@ -93,32 +102,21 @@ public class CultAI : MonoBehaviour, IDamageable
     {
         if (agent == null || isDead) return;
 
-        attackTimer += Time.deltaTime;
-
-        // Unfreeze logic
-        if (isAnimatorFrozen && attackTimer >= attackCooldown)
+        // Only tick the attack timer when NOT in the attack window (i.e., when cooling down or idling)
+        if (!isAttackingWindow)
         {
-            // CRITICAL FIX: Stop the particle stream when the attack cooldown is over
-            if (spellEmitter != null)
-            {
-                spellEmitter.Stop();
-                Debug.Log("[Cultist] Spell Emitter stopped after attack cycle.");
-            }
-
-            CancelInvoke(nameof(StartSpellCast));
-            UnfreezeAnimator();
+            attackTimer += Time.deltaTime;
         }
 
         float distanceToPlayer = player != null ? Vector3.Distance(transform.position, player.position) : Mathf.Infinity;
 
-        // FIX: Continuous rotation while attacking or when in range to attack.
-        // This ensures the enemy always tracks the player during the frozen state.
-        if (distanceToPlayer <= attackRange || isAnimatorFrozen)
+        // Continuous rotation when in the attack window or in range to attack.
+        if (distanceToPlayer <= attackRange || isAttackingWindow)
         {
             FacePlayer();
         }
 
-        if (!isAnimatorFrozen)
+        if (!isAttackingWindow) // Only move or try to initiate attack if the window is closed
         {
             if (distanceToPlayer <= attackRange)
             {
@@ -193,51 +191,73 @@ public class CultAI : MonoBehaviour, IDamageable
         agent.isStopped = true;
         agent.velocity = Vector3.zero;
 
-        // NOTE: Rotation is now handled by the FacePlayer() call in Update().
-
-        if (attackTimer >= attackCooldown)
+        // Check if the spell cooldown duration has passed (1.5 seconds)
+        if (attackTimer >= spellCooldownDuration)
         {
-            attackTimer = 0f;
+            // Reset the timer immediately to start tracking the cooldown after the window ends
+            attackTimer = 0f; 
+            
             animator.SetTrigger("Attack"); 
             animator.SetBool("IsWalking", false);
             
-            // INVOKE START SPELL CAST
-            Invoke(nameof(StartSpellCast), attackDelay); 
+            // INVOKE START ATTACK WINDOW (after the brief animation delay)
+            Invoke(nameof(StartAttackWindow), attackDelay); 
         }
     }
     
-    // This now launches the projectile and immediately schedules the animator freeze
-    void StartSpellCast()
+    /// <summary>
+    /// Called after the attackDelay. Starts the continuous 3.0s attack window.
+    /// </summary>
+    void StartAttackWindow()
     {
         // Null check for the necessary components before casting
         if (playerState != null && playerState.IsAlive() && spellEmitter != null && spellProjectile != null)
         {
-            // NEW FIX: Explicitly aim the particle emitter at the player's world position
+            isAttackingWindow = true; // Enter the 3.0s attack state
+            
+            // Explicitly aim the particle emitter at the player's world position
             if (player != null)
             {
-                // Calculate direction from the emitter's spawn point to the player's current position
                 Vector3 directionToPlayer = (player.position - spellEmitter.transform.position).normalized;
-                
-                // Create a rotation that looks in that direction
                 Quaternion targetRotation = Quaternion.LookRotation(directionToPlayer);
-                
-                // Apply the rotation immediately to the emitter's transform
-                // This ensures the particles are fired directly at the player, regardless of animation offset
                 spellEmitter.transform.rotation = targetRotation;
-                
                 Debug.Log("[Cultist] Spell Emitter rotation locked onto player for launch.");
             }
 
             // 1. Set the damage for the projectile to use on collision
             spellProjectile.SetDamage(attackDamage);
 
-            // 2. Trigger the spell visual (projectile launch)
-            // Note: The particle system will now play continuously until explicitly stopped
+            // 2. Trigger the spell visual (starts continuous firing for the window)
             spellEmitter.Play(); 
         }
         
-        // 3. Freeze the animator immediately after the launch to hold the pose
+        // 3. Freeze the animator immediately after the launch to hold the pose for the duration
         FreezeAnimator();
+
+        // 4. Schedule the end of the attack window
+        Invoke(nameof(EndAttackWindow), attackWindowDuration); 
+        
+        Debug.Log("[Cultist] Attack Window STARTED (3.0s duration).");
+    }
+
+    /// <summary>
+    /// Called after the attackWindowDuration has passed (3.0s).
+    /// </summary>
+    void EndAttackWindow()
+    {
+        // 1. Stop the continuous attack
+        if (spellEmitter != null)
+        {
+            spellEmitter.Stop();
+        }
+        
+        // 2. Allow movement/action again
+        UnfreezeAnimator();
+        
+        // 3. Exit the attack state. The attackTimer will now start counting the 1.5s cooldown.
+        isAttackingWindow = false; 
+        
+        Debug.Log("[Cultist] Attack Window ENDED. Starting 1.5s cooldown.");
     }
 
     void ChasePlayer()
@@ -263,6 +283,7 @@ public class CultAI : MonoBehaviour, IDamageable
     {
         if (animator == null) return;
 
+        // Animator updates only when NOT in the frozen attack pose
         if (!isAnimatorFrozen)
         {
             float speed = agent.velocity.magnitude;
@@ -321,10 +342,10 @@ public class CultAI : MonoBehaviour, IDamageable
         agent.isStopped = true;
         agent.velocity = Vector3.zero;
 
-        // Cancel all pending Invokes and clean up state
+        // Cancel all pending Invokes (StartAttackWindow, EndAttackWindow)
         CancelInvoke();
         
-        // FIX: Ensure emitter is stopped upon death
+        // Ensure emitter is stopped upon death
         if (spellEmitter != null) spellEmitter.Stop();
 
         UnfreezeAnimator(); 

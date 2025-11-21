@@ -5,9 +5,9 @@ using System;
 public class GauntletAbilities : MonoBehaviour
 {
     [Header("Ability Settings")]
-    public float fireDrainRate = 10f;       
-    public float iceDrainRate = 10f;        
-    public float lightDrainRate = 5f;       
+    public float fireDrainRate = 10f;       
+    public float iceDrainRate = 10f;        
+    public float lightDrainRate = 5f;       
     public float invincibleDrainRate = 15f; 
 
     [Header("Ability Availability Toggles")]
@@ -15,6 +15,11 @@ public class GauntletAbilities : MonoBehaviour
     public bool isIceEnabled = true;
     public bool isInvincibleEnabled = true;
     public bool isLightEnabled = false; 
+
+    // NEW: Timing for the Gauntlet activation delay
+    [Header("Ability Timing")] 
+    public float gauntletReadyDelay = 0.5f; // Delay (in seconds) before a spell can be cast after entering Gauntlet Mode
+    private float gauntletActivateTime = 0f; // Time when Gauntlet Mode was activated
 
     [Header("VFX Emitters")]
     public ParticleSystem fireEmitter; 
@@ -31,6 +36,8 @@ public class GauntletAbilities : MonoBehaviour
     public Material invincibleMaterial; 
     
     private PlayerState playerState;
+    // NEW: Reference to PlayerControls to access the model's rotation
+    private PlayerControls playerControls; 
     
     // MODIFIED: This now stores the entire array of original materials
     private Material[] originalPlayerMaterials; 
@@ -44,7 +51,14 @@ public class GauntletAbilities : MonoBehaviour
     void Awake()
     {
         playerState = GetComponent<PlayerState>();
+        // NEW: Get PlayerControls reference
+        playerControls = GetComponent<PlayerControls>();
         
+        if (playerControls == null)
+        {
+            Debug.LogError("GauntletAbilities: PlayerControls component not found!");
+        }
+
         if (playerRenderer != null)
         {
             // NEW: Store the entire array of original materials from the Renderer
@@ -52,7 +66,7 @@ public class GauntletAbilities : MonoBehaviour
         }
         else
         {
-             Debug.LogError("Player Renderer not assigned! Invincible visuals will not work.");
+            Debug.LogError("Player Renderer not assigned! Invincible visuals will not work.");
         }
 
         StopAllEmitters(true);
@@ -65,7 +79,14 @@ public class GauntletAbilities : MonoBehaviour
 
     void Update()
     {
-        gauntletActive = Input.GetMouseButton(1); 
+        bool wasGauntletActive = gauntletActive; // Store previous state
+        gauntletActive = Input.GetMouseButton(1); // Update current state
+
+        // NEW: Track when Gauntlet Mode is first activated (RMB press)
+        if (gauntletActive && !wasGauntletActive)
+        {
+            gauntletActivateTime = Time.time;
+        }
 
         // 1. Ability Cycling (E key)
         if (Input.GetKeyDown(KeyCode.E))
@@ -81,11 +102,18 @@ public class GauntletAbilities : MonoBehaviour
             // --- Channeled Spell Logic (Fire/Ice/Light) ---
             if (currentAbility != AbilityType.Invincible)
             {
-                if (Input.GetMouseButtonDown(0) && !isCasting && !playerState.IsInvincible())
+                // MODIFIED: Check if LMB is currently held down (GetMouseButton(0))
+                if (Input.GetMouseButton(0))
                 {
-                    StartCast();
+                    // If the gauntlet is ready, we are not already casting, AND the player is not currently invincible, start the cast.
+                    // This handles both new presses and LMB being held during the delay period.
+                    if (!isCasting && IsReadyToCast() && !playerState.IsInvincible())
+                    {
+                        StartCast();
+                    }
                 }
-                else if (Input.GetMouseButtonUp(0) && isCasting)
+                // If LMB is not held down, but we are currently casting, stop the cast.
+                else if (isCasting)
                 {
                     StopCast();
                 }
@@ -117,6 +145,29 @@ public class GauntletAbilities : MonoBehaviour
         if (isInvincibleActive)
         {
             HandleInvincibilityDrain();
+        }
+    }
+
+    // NEW: Helper function to check if the Gauntlet delay has passed
+    private bool IsReadyToCast()
+    {
+        return Time.time >= gauntletActivateTime + gauntletReadyDelay;
+    }
+
+    // NEW FIX: Aims the emitter to match the player model's forward direction (world space)
+    /// <summary>
+    /// Fixes particle emission direction by forcing the emitter's world rotation 
+    /// to align with the player model's world forward vector. This compensates 
+    /// for scale flipping issues that cause particles to fire backwards.
+    /// </summary>
+    void AimEmitterAtModelForward(ParticleSystem emitter)
+    {
+        if (playerControls != null && playerControls.modelTransform != null && emitter != null)
+        {
+            // Set the emitter's world rotation to exactly match the player model's world rotation.
+            // This ensures the particles launch in the direction the model is visually facing.
+            emitter.transform.rotation = playerControls.modelTransform.rotation;
+            Debug.Log($"[Gauntlet] {emitter.name} rotation forced to player model rotation.");
         }
     }
 
@@ -172,14 +223,17 @@ public class GauntletAbilities : MonoBehaviour
         {
             case AbilityType.Fire:
                 Debug.Log("[Gauntlet] Fire Channel START!");
+                AimEmitterAtModelForward(fireEmitter); // Apply fix to Fire
                 fireEmitter?.Play(); 
                 break;
             case AbilityType.Ice:
                 Debug.Log("[Gauntlet] Ice Channel START!");
+                AimEmitterAtModelForward(iceEmitter); // Apply fix to Ice (Primary fix for user issue)
                 iceEmitter?.Play(); 
                 break;
             case AbilityType.Light:
                 Debug.Log("[Gauntlet] Light Channel START!");
+                AimEmitterAtModelForward(lightEmitter); // Apply fix to Light
                 lightEmitter?.Play();
                 break;
         }
@@ -215,8 +269,8 @@ public class GauntletAbilities : MonoBehaviour
 
         if (playerState.GetCurrentMagic() < invincibleDrainRate * Time.deltaTime) 
         {
-             Debug.Log("[Gauntlet] Not enough magic to activate Invincibility!");
-             return;
+            Debug.Log("[Gauntlet] Not enough magic to activate Invincibility!");
+            return;
         }
 
         if (playerRenderer != null && invincibleMaterial != null)
@@ -341,15 +395,15 @@ public class GauntletAbilities : MonoBehaviour
 
         if (ability == AbilityType.Fire)
         {
-             // Fire setup code here (if needed)
+            // Fire setup code here (if needed)
         }
         else if (ability == AbilityType.Ice)
         {
-             // Ice setup code here (if needed)
+            // Ice setup code here (if needed)
         }
         else if (ability == AbilityType.Light)
         {
-             // Light setup code here (if needed)
+            // Light setup code here (if needed)
         }
     }
 }

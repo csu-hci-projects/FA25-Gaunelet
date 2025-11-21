@@ -131,6 +131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerControls
   moveSpeed: 7
   modelTransform: {fileID: 1459307604554842382}
+  gauntletYOffset: 0.6
   rotationSmoothSpeed: 10
   blockMoveSpeedMultiplier: 0.5
   aimRotationSpeed: 20
@@ -173,7 +174,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6b7f06cd233f194abc2178a21b0231d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack
-  attackDamage: 10
+  attackDamage: 15
   attackRange: 2.5
   attackDelay: 0.3
   attackCooldown: 1
@@ -261,71 +262,71 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2136754362337914770, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.5457848
+      value: 0.62336075
       objectReference: {fileID: 0}
     - target: {fileID: 2136754362337914770, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.8376724
+      value: 0.7455374
       objectReference: {fileID: 0}
     - target: {fileID: 2136754362337914770, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.006796005
+      value: 0.18782248
       objectReference: {fileID: 0}
     - target: {fileID: 2136754362337914770, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.019433735
+      value: 0.14254205
       objectReference: {fileID: 0}
     - target: {fileID: 2136754362337914770, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 113.92
+      value: 118.845
       objectReference: {fileID: 0}
     - target: {fileID: 2136754362337914770, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 5.6580048
+      value: -67.81
       objectReference: {fileID: 0}
     - target: {fileID: 2136754362337914770, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 4.6119995
+      value: -71.599
       objectReference: {fileID: 0}
     - target: {fileID: 2330394649986589512, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.012
+      value: 0.008
       objectReference: {fileID: 0}
     - target: {fileID: 2330394649986589512, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.283
+      value: 0.207
       objectReference: {fileID: 0}
     - target: {fileID: 2330394649986589512, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.239
+      value: -0.146
       objectReference: {fileID: 0}
     - target: {fileID: 2330394649986589512, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.4075011
+      value: 0.47046715
       objectReference: {fileID: 0}
     - target: {fileID: 2330394649986589512, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.6307542
+      value: 0.5791061
       objectReference: {fileID: 0}
     - target: {fileID: 2330394649986589512, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.548889
+      value: 0.518905
       objectReference: {fileID: 0}
     - target: {fileID: 2330394649986589512, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.36716878
+      value: -0.41717428
       objectReference: {fileID: 0}
     - target: {fileID: 2330394649986589512, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 113.489
+      value: 102.082
       objectReference: {fileID: 0}
     - target: {fileID: 2330394649986589512, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 2.2779999
+      value: -1.3900146
       objectReference: {fileID: 0}
     - target: {fileID: 2330394649986589512, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: -80.56601
+      value: -84.84799
       objectReference: {fileID: 0}
     - target: {fileID: 2379559887721486216, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: damagePerParticle
