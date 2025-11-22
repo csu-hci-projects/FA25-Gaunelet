@@ -9528,6 +9528,7 @@ MonoBehaviour:
   chaseSpeed: 4
   maxHP: 80
   currentHP: 80
+  physicalDamageImmunityThreshold: 10
   deathDestroyDelay: 3
 --- !u!195 &601849669
 NavMeshAgent:
@@ -10265,7 +10266,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 362382201567295136, guid: 58d626d62e6226143840777319c75bd8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 17.87
+      value: 21.61
       objectReference: {fileID: 0}
     - target: {fileID: 362382201567295136, guid: 58d626d62e6226143840777319c75bd8, type: 3}
       propertyPath: m_LocalPosition.z
@@ -12448,6 +12449,7 @@ MonoBehaviour:
   chaseSpeed: 4
   maxHP: 80
   currentHP: 80
+  physicalDamageImmunityThreshold: 10
   deathDestroyDelay: 3
 --- !u!195 &827784333
 NavMeshAgent:
@@ -17287,6 +17289,7 @@ MonoBehaviour:
   chaseSpeed: 4
   maxHP: 80
   currentHP: 80
+  physicalDamageImmunityThreshold: 10
   deathDestroyDelay: 3
 --- !u!195 &1167910648
 NavMeshAgent:
@@ -18862,6 +18865,7 @@ MonoBehaviour:
   chaseSpeed: 4
   maxHP: 80
   currentHP: 80
+  physicalDamageImmunityThreshold: 10
   deathDestroyDelay: 3
 --- !u!195 &1254775031
 NavMeshAgent:
@@ -22452,6 +22456,7 @@ MonoBehaviour:
   chaseSpeed: 4
   maxHP: 80
   currentHP: 80
+  physicalDamageImmunityThreshold: 10
   deathDestroyDelay: 3
 --- !u!195 &1512755446
 NavMeshAgent:
@@ -22861,6 +22866,7 @@ MonoBehaviour:
   chaseSpeed: 4
   maxHP: 80
   currentHP: 80
+  physicalDamageImmunityThreshold: 10
   deathDestroyDelay: 3
 --- !u!195 &1538169959
 NavMeshAgent:
@@ -23576,10 +23582,6 @@ PrefabInstance:
     - target: {fileID: 5275063899020513691, guid: 28efd9deb0351014bb96b9fed7a6edd5, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 7335530344383147366, guid: 28efd9deb0351014bb96b9fed7a6edd5, type: 3}
-      propertyPath: gauntletReadyDelay
-      value: 0.2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -32703,6 +32705,7 @@ MonoBehaviour:
   chaseSpeed: 4
   maxHP: 80
   currentHP: 80
+  physicalDamageImmunityThreshold: 10
   deathDestroyDelay: 3
 --- !u!65 &4524755726782000468
 BoxCollider:

@@ -3,7 +3,6 @@ using TMPro;
 
 public class SignInfo : MonoBehaviour
 {
-    // === MODIFIED: Public field, editable in the Inspector ===
     [Header("Sign Content")]
     [TextArea(3, 10)] // Makes the input field multi-line in the Inspector
     public string signMessage = 
@@ -41,7 +40,6 @@ public class SignInfo : MonoBehaviour
         if (other.CompareTag(PLAYER_TAG))
         {
             isPlayerInRange = true;
-            // You could add logic here to show a small "Press Space" prompt to the player
             Debug.Log("Player entered sign range. Press Space to read.");
         }
     }
@@ -54,7 +52,6 @@ public class SignInfo : MonoBehaviour
             isPlayerInRange = false;
             // Force the UI closed when the player walks away.
             HideText();
-            // You could add logic here to hide the small "Press Space" prompt
             Debug.Log("Player left sign range.");
         }
     }

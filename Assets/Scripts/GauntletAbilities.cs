@@ -5,9 +5,9 @@ using System;
 public class GauntletAbilities : MonoBehaviour
 {
     [Header("Ability Settings")]
-    public float fireDrainRate = 10f;       
-    public float iceDrainRate = 10f;        
-    public float lightDrainRate = 5f;       
+    public float fireDrainRate = 10f;
+    public float iceDrainRate = 10f;
+    public float lightDrainRate = 5f;
     public float invincibleDrainRate = 15f; 
 
     [Header("Ability Availability Toggles")]
@@ -16,7 +16,9 @@ public class GauntletAbilities : MonoBehaviour
     public bool isInvincibleEnabled = true;
     public bool isLightEnabled = false; 
 
-    // NEW: Timing for the Gauntlet activation delay
+    // Timing for the Gauntlet activation delay
+    // Delay helps avoid "spell skew" and gives time for game to check mouse
+    // position for accurate aiming
     [Header("Ability Timing")] 
     public float gauntletReadyDelay = 0.5f; // Delay (in seconds) before a spell can be cast after entering Gauntlet Mode
     private float gauntletActivateTime = 0f; // Time when Gauntlet Mode was activated
@@ -36,10 +38,8 @@ public class GauntletAbilities : MonoBehaviour
     public Material invincibleMaterial; 
     
     private PlayerState playerState;
-    // NEW: Reference to PlayerControls to access the model's rotation
     private PlayerControls playerControls; 
     
-    // MODIFIED: This now stores the entire array of original materials
     private Material[] originalPlayerMaterials; 
     
     private bool gauntletActive = false;
@@ -51,7 +51,6 @@ public class GauntletAbilities : MonoBehaviour
     void Awake()
     {
         playerState = GetComponent<PlayerState>();
-        // NEW: Get PlayerControls reference
         playerControls = GetComponent<PlayerControls>();
         
         if (playerControls == null)
@@ -61,7 +60,6 @@ public class GauntletAbilities : MonoBehaviour
 
         if (playerRenderer != null)
         {
-            // NEW: Store the entire array of original materials from the Renderer
             originalPlayerMaterials = playerRenderer.sharedMaterials;
         }
         else
@@ -154,12 +152,8 @@ public class GauntletAbilities : MonoBehaviour
         return Time.time >= gauntletActivateTime + gauntletReadyDelay;
     }
 
-    // NEW FIX: Aims the emitter to match the player model's forward direction (world space)
-    /// <summary>
-    /// Fixes particle emission direction by forcing the emitter's world rotation 
-    /// to align with the player model's world forward vector. This compensates 
-    /// for scale flipping issues that cause particles to fire backwards.
-    /// </summary>
+    // Aims the emitter to match the player model's forward direction
+
     void AimEmitterAtModelForward(ParticleSystem emitter)
     {
         if (playerControls != null && playerControls.modelTransform != null && emitter != null)
@@ -223,17 +217,17 @@ public class GauntletAbilities : MonoBehaviour
         {
             case AbilityType.Fire:
                 Debug.Log("[Gauntlet] Fire Channel START!");
-                AimEmitterAtModelForward(fireEmitter); // Apply fix to Fire
+                AimEmitterAtModelForward(fireEmitter); 
                 fireEmitter?.Play(); 
                 break;
             case AbilityType.Ice:
                 Debug.Log("[Gauntlet] Ice Channel START!");
-                AimEmitterAtModelForward(iceEmitter); // Apply fix to Ice (Primary fix for user issue)
+                AimEmitterAtModelForward(iceEmitter); 
                 iceEmitter?.Play(); 
                 break;
             case AbilityType.Light:
                 Debug.Log("[Gauntlet] Light Channel START!");
-                AimEmitterAtModelForward(lightEmitter); // Apply fix to Light
+                AimEmitterAtModelForward(lightEmitter);
                 lightEmitter?.Play();
                 break;
         }
@@ -262,7 +256,6 @@ public class GauntletAbilities : MonoBehaviour
         }
     }
 
-    // MODIFIED: Sets ALL materials to the invincible material
     void StartInvincibility()
     {
         if (!IsAbilityEnabled(AbilityType.Invincible) || isInvincibleActive) return;
@@ -294,7 +287,6 @@ public class GauntletAbilities : MonoBehaviour
         Debug.Log("[Gauntlet] Invincibility activated and draining magic!");
     }
 
-    // MODIFIED: Restores the ENTIRE array of original materials
     void EndInvincibility()
     {
         if (!isInvincibleActive) return;
@@ -395,15 +387,12 @@ public class GauntletAbilities : MonoBehaviour
 
         if (ability == AbilityType.Fire)
         {
-            // Fire setup code here (if needed)
         }
         else if (ability == AbilityType.Ice)
         {
-            // Ice setup code here (if needed)
         }
         else if (ability == AbilityType.Light)
         {
-            // Light setup code here (if needed)
         }
     }
 }

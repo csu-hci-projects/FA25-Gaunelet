@@ -9,9 +9,8 @@ public class SpellProjectile : MonoBehaviour
     // NOTE: This relies on the Particle System having Collision enabled 
     // and "Send Collision Messages" checked in the Inspector.
 
-    /// <summary>
-    /// Called when the particle collides with another object.
-    /// </summary>
+
+    // Called when the particle collides with another object.
     private void OnParticleCollision(GameObject other)
     {
         // Check if the collided object is the Player
@@ -28,9 +27,8 @@ public class SpellProjectile : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Called by the CultAI script to initialize damage value.
-    /// </summary>
+
+    // Called by the CultAI script to initialize damage value.
     public void SetDamage(float newDamage)
     {
         damage = newDamage;

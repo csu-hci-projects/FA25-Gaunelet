@@ -1,7 +1,5 @@
 using UnityEngine;
 
-// REMOVED: DamageSource enum is no longer needed
-
 public class PlayerState : MonoBehaviour, IDamageable
 {
     [Header("Health & Magic Stats")]
@@ -47,12 +45,6 @@ public class PlayerState : MonoBehaviour, IDamageable
         }
     }
 
-    // --- HP Methods (IDamageable Implementation) ---
-    /// <summary>
-    /// Applies damage to the player. Damage is always applied.
-    /// </summary>
-    /// <param name="damage">The raw damage value.</param>
-    // FIX: Reverted signature to match the simplified IDamageable interface
     public void TakeDamage(float damage) 
     {
         // 1. Check for permanent Invincibility (Highest priority)
@@ -61,8 +53,6 @@ public class PlayerState : MonoBehaviour, IDamageable
             Debug.Log("[PlayerState: HP] Invincible! Damage blocked.");
             return;
         }
-
-        // REMOVED: Temporary damage invulnerability check. Damage is always applied.
         
         // --- Damage Application ---
 

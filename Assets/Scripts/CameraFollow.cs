@@ -4,20 +4,15 @@ public class CameraFollow : MonoBehaviour
 {
     [Header("Target & Speed")]
     public Transform target;
-    // TWEAK this value: A slightly higher value will make it feel smoother.
     public float smoothTime = 0.2f; 
 
     private Vector3 offset;
     private Vector3 velocity = Vector3.zero;
-    
-    // Removed the private bool useFixedUpdate = false;
 
     void Start()
     {
         // Calculate the initial fixed offset
         offset = transform.position - target.position;
-        
-        // We will now rely exclusively on LateUpdate for smooth visual following
     }
 
     // Use LateUpdate to ensure the camera position is updated 
@@ -26,8 +21,6 @@ public class CameraFollow : MonoBehaviour
     {
         FollowTarget();
     }
-    
-    // Removed the empty FixedUpdate()
 
     void FollowTarget()
     {

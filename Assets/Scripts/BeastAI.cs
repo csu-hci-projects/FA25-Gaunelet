@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 // BeastAI now implements the IDamageable interface
-public class BeastAI : MonoBehaviour, IDamageable // Renamed class
+public class BeastAI : MonoBehaviour, IDamageable 
 {
     [Header("Wander Settings")]
     [SerializeField] private float wanderRadius = 15f; 
@@ -15,29 +15,26 @@ public class BeastAI : MonoBehaviour, IDamageable // Renamed class
 
     [Header("Combat Settings (Increased Aggression/Power)")]
     [SerializeField] private Transform player;
-    [SerializeField] private float chaseRange = 15f;    // TWEAK: Increased detection range (more aggressive)
-    [SerializeField] private float attackRange = 1.8f;  // Slightly larger attack range for a bigger beast
-    [SerializeField] private float attackCooldown = 1.5f; // TWEAK: Slightly faster attacks
-    [SerializeField] private float attackDamage = 35f;  // TWEAK: High attack damage (stronger)
+    [SerializeField] private float chaseRange = 15f;    
+    [SerializeField] private float attackRange = 1.8f;  
+    [SerializeField] private float attackCooldown = 1.5f; 
+    [SerializeField] private float attackDamage = 35f;  
     [SerializeField] private float attackDelay = 0.5f; 
-    [SerializeField] private float chaseSpeed = 6.5f;   // TWEAK: Faster chase speed (more aggressive)
+    [SerializeField] private float chaseSpeed = 6.5f;   
 
     [Header("Beast Stats")]
-    [SerializeField] private float maxHP = 120f;        // TWEAK: High HP (tougher)
-    [SerializeField] private float currentHP = 120f;    // TWEAK: High HP (tougher)
+    [SerializeField] private float maxHP = 120f;        
+    [SerializeField] private float currentHP = 120f;    
 
     [Header("Death Settings")]
-    [SerializeField] private float deathDestroyDelay = 3f; // TWEAK: Slightly longer delay for death animation
+    [SerializeField] private float deathDestroyDelay = 3f; 
 
     private NavMeshAgent agent;
     private Animator animator;
-    // NOTE: Requires a PlayerState script to exist in your project
     private PlayerState playerState; 
 
     private float attackTimer = 0f;
     private bool isDead = false;
-
-    // --- Unity Life Cycle ---
 
     void Start()
     {
@@ -53,7 +50,7 @@ public class BeastAI : MonoBehaviour, IDamageable // Renamed class
         // Set the spawn point to the beast's starting position
         spawnPoint = transform.position;
 
-        // Get PlayerState component from player (REQUIRED)
+        // Get PlayerState component from player
         if (player != null)
         {
             playerState = player.GetComponent<PlayerState>();
@@ -101,7 +98,6 @@ public class BeastAI : MonoBehaviour, IDamageable // Renamed class
     }
 
     // --- Movement Logic: Replaces Patrol ---
-
     void Wander()
     {
         agent.isStopped = false;
@@ -133,7 +129,6 @@ public class BeastAI : MonoBehaviour, IDamageable // Renamed class
     }
 
     // --- Combat Logic ---
-
     void TryAttackPlayer()
     {
         agent.isStopped = true;
@@ -195,7 +190,6 @@ public class BeastAI : MonoBehaviour, IDamageable // Renamed class
     }
 
     // --- IDamageable Implementation ---
-
     public void TakeDamage(float damage)
     {
         if (isDead) return;

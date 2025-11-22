@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-// Assuming IDamageable interface is defined elsewhere
 public class CultAI : MonoBehaviour, IDamageable
 {
     [Header("Wander Settings")]
@@ -18,13 +17,13 @@ public class CultAI : MonoBehaviour, IDamageable
     [SerializeField] private float chaseRange = 12f;  
     [SerializeField] private float attackRange = 8f;   
     
-    // NEW: Duration the spell will continuously fire (The "window")
+    // continuous spell firing
     [SerializeField] private float attackWindowDuration = 3.0f; 
-    // MODIFIED: Duration the enemy must wait after the window ends (The "cooldown")
+    // casting cooldown
     [SerializeField] private float spellCooldownDuration = 1.5f; 
     
     [SerializeField] private float attackDamage = 25f; 
-    [SerializeField] private float attackDelay = 0.5f; // Time from animation trigger to spell launch
+    [SerializeField] private float attackDelay = 0.5f;
     
     [SerializeField] private float chaseSpeed = 3.5f; 
 
@@ -41,15 +40,11 @@ public class CultAI : MonoBehaviour, IDamageable
     private NavMeshAgent agent;
     private Animator animator;
     private PlayerState playerState;
-    // NEW: Reference to the projectile script
     private SpellProjectile spellProjectile; 
-
-    // This timer now tracks the time spent in the recovery/cooldown phase
     private float attackTimer = 0f; 
     private bool isDead = false;
-    private bool isAttackingWindow = false; // NEW STATE: True when the 3s window is active
+    private bool isAttackingWindow = false;
 
-    // isAnimatorFrozen is now managed only by the Attack Window state
     private bool isAnimatorFrozen = false; 
 
     void Start()
@@ -167,9 +162,7 @@ public class CultAI : MonoBehaviour, IDamageable
 
     // --- Combat Logic ---
     
-    /// <summary>
-    /// Rotates the enemy to face the player using the fast combat speed.
-    /// </summary>
+    // Rotates the enemy to face the player using the fast combat speed.
     void FacePlayer()
     {
         if (player == null) return;
@@ -205,9 +198,8 @@ public class CultAI : MonoBehaviour, IDamageable
         }
     }
     
-    /// <summary>
-    /// Called after the attackDelay. Starts the continuous 3.0s attack window.
-    /// </summary>
+
+    // Called after the attackDelay. Starts the continuous 3.0s attack window.
     void StartAttackWindow()
     {
         // Null check for the necessary components before casting
@@ -240,9 +232,7 @@ public class CultAI : MonoBehaviour, IDamageable
         Debug.Log("[Cultist] Attack Window STARTED (3.0s duration).");
     }
 
-    /// <summary>
-    /// Called after the attackWindowDuration has passed (3.0s).
-    /// </summary>
+    // Called after the attackWindowDuration has passed (3.0s).
     void EndAttackWindow()
     {
         // 1. Stop the continuous attack

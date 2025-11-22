@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-// GhostAI implements the IDamageable interface
 public class GhostAI : MonoBehaviour, IDamageable
 {
     [Header("Patrol Settings")]
@@ -25,6 +24,10 @@ public class GhostAI : MonoBehaviour, IDamageable
     [SerializeField] private float maxHP = 50f;
     [SerializeField] private float currentHP = 50f;
 
+    [Header("Immunity Settings")] 
+    [Tooltip("Any incoming damage >= this value is considered physical (sword) damage and will be ignored.")]
+    [SerializeField] private float physicalDamageImmunityThreshold = 10f;
+
     [Header("Death Settings")]
     [SerializeField] private float deathDestroyDelay = 2f;
 
@@ -40,10 +43,6 @@ public class GhostAI : MonoBehaviour, IDamageable
     // Combat variables
     private float attackTimer = 0f;
     private bool isDead = false;
-
-    // CONSTANTS FOR IMMUNITY CHECK 
-    // We only need the sword damage to block. The magic threshold is removed.
-    private const float SWORD_DAMAGE_AMOUNT = 10f; 
 
     void Start()
     {
@@ -148,7 +147,6 @@ public class GhostAI : MonoBehaviour, IDamageable
     }
 
     // --- Patrol Logic ---
-
     void Patrol()
     {
         agent.speed = patrolSpeed; 
@@ -215,15 +213,15 @@ public class GhostAI : MonoBehaviour, IDamageable
     {
         if (isDead) return;
 
-        // 1. Block Sword Damage: If damage is exactly 10f (within a small tolerance), block it.
-        // This is the ONLY condition where damage is rejected.
-        if (Mathf.Abs(damage - SWORD_DAMAGE_AMOUNT) < 0.001f)
+        // NEW LOGIC: Block any damage that is greater than or equal to the threshold.
+        // This assumes high-damage hits are physical (sword) and low-damage hits are magic.
+        if (damage >= physicalDamageImmunityThreshold)
         {
-            Debug.Log($"[Ghost] Sword damage ({damage}HP) BLOCKED! Only magic affects me.");
+            Debug.Log($"[Ghost] Physical damage ({damage:F2}HP) BLOCKED! Damage >= Threshold ({physicalDamageImmunityThreshold:F2}HP).");
             return; 
         }
         
-        // 2. Apply Magic Damage (or any other non-sword damage > 0).
+        // Damage is applied if it's below the threshold (assumed to be magic/particle damage).
         if (damage > 0.0f)
         {
             currentHP -= damage;
@@ -232,8 +230,8 @@ public class GhostAI : MonoBehaviour, IDamageable
         }
         else
         {
-             // Ignore zero or negative damage
-             return; 
+            // Ignore zero or negative damage
+            return; 
         }
         
         if (currentHP <= 0)

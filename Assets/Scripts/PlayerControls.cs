@@ -10,9 +10,7 @@ public class PlayerControls : MonoBehaviour
     public Transform modelTransform; // Child with Skinned Mesh + Animator
     private Animator animator;
     
-    // NEW: Model Offset during Gauntlet Mode
     [Header("Gauntlet Visual Offset")]
-    // Adjust this value in the Inspector to find the perfect height
     public float gauntletYOffset = 0.08f; 
     private Vector3 originalModelLocalPosition; // Store initial position
 
@@ -46,7 +44,6 @@ public class PlayerControls : MonoBehaviour
         rb.freezeRotation = true;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
 
-        // NEW: Define the ground plane at the player's Y level
         // We set the initial position here, but update it dynamically in Update()
         groundPlane = new Plane(Vector3.up, transform.position);
 
@@ -100,7 +97,6 @@ public class PlayerControls : MonoBehaviour
             animator.SetBool(IS_WALKING, isWalking);
         }
 
-        // NEW: Calculate target rotation based on aiming state in Update
         CalculateTargetRotation();
     }
 

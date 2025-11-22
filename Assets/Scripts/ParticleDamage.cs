@@ -5,7 +5,6 @@ public class ParticleDamage : MonoBehaviour
     [Header("Damage Settings")]
     public float damagePerParticle = 0.1f; 
 
-    // Player tag defined for exclusion
     private const string PLAYER_TAG = "Player"; 
 
     void OnParticleCollision(GameObject other)

@@ -21,7 +21,6 @@ public class HPGain : MonoBehaviour
         if (pickupCollider == null || meshRenderer == null)
         {
             Debug.LogError("HPGain script requires both a Collider and a MeshRenderer!");
-            // Optionally, try to find in children if the pickup item is complex
         }
     }
 

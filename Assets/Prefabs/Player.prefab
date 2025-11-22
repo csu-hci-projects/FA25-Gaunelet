@@ -129,7 +129,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 457f19aa25ba24f4b95b0c8d1374e690, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerControls
-  moveSpeed: 7
+  moveSpeed: 8
   modelTransform: {fileID: 1459307604554842382}
   gauntletYOffset: 0.6
   rotationSmoothSpeed: 10
@@ -177,7 +177,7 @@ MonoBehaviour:
   attackDamage: 15
   attackRange: 2.5
   attackDelay: 0.3
-  attackCooldown: 1
+  attackCooldown: 0.8
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -215,11 +215,12 @@ MonoBehaviour:
   fireDrainRate: 5
   iceDrainRate: 4
   lightDrainRate: 8
-  invincibleDrainRate: 8
+  invincibleDrainRate: 6
   isFireEnabled: 1
   isIceEnabled: 1
   isInvincibleEnabled: 1
   isLightEnabled: 0
+  gauntletReadyDelay: 0.2
   fireEmitter: {fileID: 6221686763417088336}
   iceEmitter: {fileID: 7757345313659600266}
   lightEmitter: {fileID: 6221686763417088336}
@@ -246,7 +247,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 064e96d35b5e1584ebebf18db1b24363, type: 2}
     - target: {fileID: 2086743668947508050, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: damagePerParticle
-      value: 0.25
+      value: 0.23
       objectReference: {fileID: 0}
     - target: {fileID: 2136754362337914770, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -330,7 +331,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2379559887721486216, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: damagePerParticle
-      value: 0.18
+      value: 0.17
       objectReference: {fileID: 0}
     - target: {fileID: 4965793662766083828, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
