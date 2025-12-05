@@ -97,7 +97,7 @@ public class PlayerState : MonoBehaviour, IDamageable
         
         if (currentMagic < previousMagic)
         {
-            Debug.Log($"[PlayerState: Magic] Used {amount:F2} | Current: {currentMagic:F2}/{maxMagic}");
+            // Debug.Log($"[PlayerState: Magic] Used {amount:F2} | Current: {currentMagic:F2}/{maxMagic}");
         }
     }
 

@@ -1,27 +1,35 @@
 using UnityEngine;
 using System; 
+using UnityEngine.SceneManagement; 
 
 [RequireComponent(typeof(PlayerState))]
 public class GauntletAbilities : MonoBehaviour
 {
+    // --- Persistence Keys ---
+    private const string FireKey = "Ability_Fire";
+    private const string IceKey = "Ability_Ice";
+    private const string InvincibleKey = "Ability_Invincible";
+    private const string LightKey = "Ability_Light";
+
     [Header("Ability Settings")]
     public float fireDrainRate = 10f;
     public float iceDrainRate = 10f;
     public float lightDrainRate = 5f;
     public float invincibleDrainRate = 15f; 
 
+    // NOTE: These fields now represent the CURRENT state, which is determined 
+    // by scene defaults AND persistence loading in Start().
     [Header("Ability Availability Toggles")]
-    public bool isFireEnabled = true;
+    // Inspector values now only serve as a generic fallback for unknown scenes.
+    public bool isFireEnabled = true; 
     public bool isIceEnabled = true;
     public bool isInvincibleEnabled = true;
     public bool isLightEnabled = false; 
 
     // Timing for the Gauntlet activation delay
-    // Delay helps avoid "spell skew" and gives time for game to check mouse
-    // position for accurate aiming
     [Header("Ability Timing")] 
-    public float gauntletReadyDelay = 0.5f; // Delay (in seconds) before a spell can be cast after entering Gauntlet Mode
-    private float gauntletActivateTime = 0f; // Time when Gauntlet Mode was activated
+    public float gauntletReadyDelay = 0.5f; 
+    private float gauntletActivateTime = 0f; 
 
     [Header("VFX Emitters")]
     public ParticleSystem fireEmitter; 
@@ -60,6 +68,7 @@ public class GauntletAbilities : MonoBehaviour
 
         if (playerRenderer != null)
         {
+            // Store the original materials when the component starts
             originalPlayerMaterials = playerRenderer.sharedMaterials;
         }
         else
@@ -72,15 +81,160 @@ public class GauntletAbilities : MonoBehaviour
 
     void Start()
     {
+        // Load or Initialize ability states based on the scene index
+        InitializeAbilityStates(); 
+        
         EnsureCurrentAbilityIsEnabled(true);
+    }
+
+    // Utility for debugging persistence
+    [ContextMenu("Clear All Ability Persistence Data")]
+    public void ClearAllAbilityData()
+    {
+        PlayerPrefs.DeleteKey(FireKey);
+        PlayerPrefs.DeleteKey(IceKey);
+        PlayerPrefs.DeleteKey(InvincibleKey);
+        PlayerPrefs.DeleteKey(LightKey);
+        PlayerPrefs.Save();
+        Debug.LogWarning("ALL ABILITY PERSISTENCE DATA CLEARED. Next scene load will use scene defaults.");
+        // Reload state to reflect the clear (optional)
+        InitializeAbilityStates(); 
+    }
+
+    /// <summary>
+    /// Handles initial setup by strictly enforcing the scene's minimum required abilities.
+    /// Scene 1 logic strictly overrides persistence for Invincible.
+    /// </summary>
+    private void InitializeAbilityStates()
+    {
+        int sceneIndex = SceneManager.GetActiveScene().buildIndex;
+
+        // 1. Reset all fields to FALSE. This is the baseline state.
+        isFireEnabled = false;
+        isIceEnabled = false;
+        isInvincibleEnabled = false;
+        isLightEnabled = false;
+
+        // SCENE 0: Full Reset (Clears persistence)
+        if (sceneIndex == 0)
+        {
+            Debug.Log("[Gauntlet] Scene 0 detected. Disabling all abilities and clearing persistence.");
+            // SetAbilityEnabled ensures the PlayerPrefs key is set to 0 (disabled)
+            SetAbilityEnabled(AbilityType.Fire, false);
+            SetAbilityEnabled(AbilityType.Ice, false);
+            SetAbilityEnabled(AbilityType.Invincible, false);
+            SetAbilityEnabled(AbilityType.Light, false);
+            return;
+        }
+
+        // 2. Apply Scene Minimum Requirements (STRICTLY based on scene index)
+        
+        if (sceneIndex == 1) // Scene 1 (Dungeon): Only Fire and Ice
+        {
+            Debug.Log("[Gauntlet] Scene 1 strict enforcement: Only Fire and Ice enabled.");
+            isFireEnabled = true;
+            isIceEnabled = true;
+            // Invincible and Light remain FALSE, overriding any persistence.
+        }
+        else if (sceneIndex >= 2) // Scene 2 (Labyrinth) and higher: Base abilities + Invincible
+        {
+            Debug.Log("[Gauntlet] Scene 2+ detected. Enabling Fire, Ice, and Invincible.");
+            isFireEnabled = true;
+            isIceEnabled = true;
+            isInvincibleEnabled = true;
+        }
+
+        // 3. Load Persistence ONLY for abilities not guaranteed by scene minimums.
+        // This primarily handles the Light ability, which is an optional final unlock.
+        // Invincible persistence is now successfully bypassed by the 'sceneIndex == 1' block above.
+        
+        // --- Persistence Check: Light (Ability 4) ---
+        int lightInt = PlayerPrefs.GetInt(LightKey, 0); 
+        if (lightInt == 1)
+        {
+            isLightEnabled = true;
+            Debug.Log("[Gauntlet Load] Light loaded from persistence (unlocked).");
+        }
+    }
+    
+    // Public method for the AbilityPickup to call
+    public void EnableAbility(AbilityType ability)
+    {
+        // 1. Update the in-memory state
+        switch (ability)
+        {
+            case AbilityType.Fire:
+                isFireEnabled = true;
+                break;
+            case AbilityType.Ice:
+                isIceEnabled = true;
+                break;
+            case AbilityType.Invincible:
+                isInvincibleEnabled = true;
+                break;
+            case AbilityType.Light:
+                isLightEnabled = true;
+                break;
+        }
+
+        // 2. Save the new state permanently (set to 1)
+        SaveAbilityState(ability, true);
+
+        // 3. If the newly enabled ability is the first one found, switch to it automatically
+        if (!IsAbilityEnabled(currentAbility))
+        {
+            currentAbility = ability;
+            ApplySpellVisuals(currentAbility, true);
+        }
+        
+        Debug.Log($"[Gauntlet] {ability} ability is now permanently ENABLED.");
+    }
+    
+    // Logic to save a single ability state
+    private void SaveAbilityState(AbilityType ability, bool isEnabled)
+    {
+        string key = GetAbilityKey(ability);
+        // PlayerPrefs stores 1 for true, 0 for false
+        PlayerPrefs.SetInt(key, isEnabled ? 1 : 0);
+        PlayerPrefs.Save(); // Ensure data is written to disk immediately
+        Debug.Log($"[Gauntlet] Saved {key} state: {isEnabled}");
+    }
+
+    // Helper to set ability state (used by InitializeAbilityStates - primarily for Scene 0 reset)
+    private void SetAbilityEnabled(AbilityType ability, bool isEnabled)
+    {
+        switch (ability)
+        {
+            case AbilityType.Fire: isFireEnabled = isEnabled; break;
+            case AbilityType.Ice: isIceEnabled = isEnabled; break;
+            case AbilityType.Invincible: isInvincibleEnabled = isEnabled; break;
+            case AbilityType.Light: isLightEnabled = isEnabled; break;
+        }
+        // When called from Scene 0, this saves the state as 0 for persistence reset
+        SaveAbilityState(ability, isEnabled); 
+    }
+    
+    // Helper to get the PlayerPrefs key
+    private string GetAbilityKey(AbilityType ability)
+    {
+        return ability switch
+        {
+            AbilityType.Fire => FireKey,
+            AbilityType.Ice => IceKey,
+            AbilityType.Invincible => InvincibleKey,
+            AbilityType.Light => LightKey,
+            _ => throw new ArgumentException("Invalid AbilityType")
+        };
     }
 
     void Update()
     {
+        if (playerState == null) return;
+        
         bool wasGauntletActive = gauntletActive; // Store previous state
         gauntletActive = Input.GetMouseButton(1); // Update current state
 
-        // NEW: Track when Gauntlet Mode is first activated (RMB press)
+        // Track when Gauntlet Mode is first activated (RMB press)
         if (gauntletActive && !wasGauntletActive)
         {
             gauntletActivateTime = Time.time;
@@ -100,12 +254,11 @@ public class GauntletAbilities : MonoBehaviour
             // --- Channeled Spell Logic (Fire/Ice/Light) ---
             if (currentAbility != AbilityType.Invincible)
             {
-                // MODIFIED: Check if LMB is currently held down (GetMouseButton(0))
+                // Check if LMB is currently held down (GetMouseButton(0))
                 if (Input.GetMouseButton(0))
                 {
                     // If the gauntlet is ready, we are not already casting, AND the player is not currently invincible, start the cast.
-                    // This handles both new presses and LMB being held during the delay period.
-                    if (!isCasting && IsReadyToCast() && !playerState.IsInvincible())
+                    if (!isCasting && IsReadyToCast() && !isInvincibleActive) 
                     {
                         StartCast();
                     }
@@ -120,6 +273,7 @@ public class GauntletAbilities : MonoBehaviour
             // --- Invincibility Logic ---
             if (currentAbility == AbilityType.Invincible)
             {
+                // Invincibility is activated immediately when RMB is held and it is the current ability.
                 if (!isInvincibleActive)
                 {
                     StartInvincibility();
@@ -146,14 +300,13 @@ public class GauntletAbilities : MonoBehaviour
         }
     }
 
-    // NEW: Helper function to check if the Gauntlet delay has passed
+    // Helper function to check if the Gauntlet delay has passed
     private bool IsReadyToCast()
     {
         return Time.time >= gauntletActivateTime + gauntletReadyDelay;
     }
 
     // Aims the emitter to match the player model's forward direction
-
     void AimEmitterAtModelForward(ParticleSystem emitter)
     {
         if (playerControls != null && playerControls.modelTransform != null && emitter != null)
@@ -258,6 +411,7 @@ public class GauntletAbilities : MonoBehaviour
 
     void StartInvincibility()
     {
+        // Check availability first. If it's disabled, the persistence logic is working.
         if (!IsAbilityEnabled(AbilityType.Invincible) || isInvincibleActive) return;
 
         if (playerState.GetCurrentMagic() < invincibleDrainRate * Time.deltaTime) 
@@ -279,7 +433,7 @@ public class GauntletAbilities : MonoBehaviour
             }
 
             // 3. Apply the new array, visually overriding the entire model
-            playerRenderer.materials = newMaterials;
+            playerRenderer.materials = newMaterials; 
         }
 
         playerState.SetInvincible(true);
@@ -294,7 +448,8 @@ public class GauntletAbilities : MonoBehaviour
         // Restore the original material array
         if (playerRenderer != null && originalPlayerMaterials != null)
         {
-            playerRenderer.materials = originalPlayerMaterials;
+            // IMPORTANT: Assigning the cached array restores the original appearance
+            playerRenderer.materials = originalPlayerMaterials; 
         }
 
         playerState.SetInvincible(false); 
@@ -304,7 +459,18 @@ public class GauntletAbilities : MonoBehaviour
     
     // --- Helper Logic Methods ---
 
-    private bool IsAbilityEnabled(AbilityType ability)
+    /// <summary>
+    /// Public accessor for other scripts to check the currently selected ability type.
+    /// </summary>
+    public AbilityType GetCurrentAbility()
+    {
+        return currentAbility;
+    }
+
+    /// <summary>
+    /// Checks the current in-memory state of an ability (determined by Scene Default OR Persistence).
+    /// </summary>
+    public bool IsAbilityEnabled(AbilityType ability)
     {
         return ability switch
         {
@@ -385,6 +551,8 @@ public class GauntletAbilities : MonoBehaviour
 
         StopAllEmitters(); 
 
+        // NOTE: The visual switching logic is currently empty here, 
+        // but this is where you would activate the visual feedback for the selected ability.
         if (ability == AbilityType.Fire)
         {
         }

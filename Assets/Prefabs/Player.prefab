@@ -246,6 +246,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2100000, guid: 064e96d35b5e1584ebebf18db1b24363, type: 2}
     - target: {fileID: 2086743668947508050, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
+      propertyPath: damageAmount
+      value: 0.21
+      objectReference: {fileID: 0}
+    - target: {fileID: 2086743668947508050, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: damagePerParticle
       value: 0.23
       objectReference: {fileID: 0}
@@ -328,6 +332,10 @@ PrefabInstance:
     - target: {fileID: 2330394649986589512, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -84.84799
+      objectReference: {fileID: 0}
+    - target: {fileID: 2379559887721486216, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
+      propertyPath: damageAmount
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 2379559887721486216, guid: fa1d3d54695f2094796de71eb5355ab6, type: 3}
       propertyPath: damagePerParticle
