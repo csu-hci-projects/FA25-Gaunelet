@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-// SpiderAI now implements the IDamageable interface
 public class SpiderAI : MonoBehaviour, IDamageable
 {
     [Header("Wander Settings")]
@@ -50,7 +49,7 @@ public class SpiderAI : MonoBehaviour, IDamageable
         // Set the spawn point to the spider's starting position
         spawnPoint = transform.position;
 
-        // Get PlayerState component from player (REQUIRED)
+        // Get PlayerState component from player
         if (player != null)
         {
             playerState = player.GetComponent<PlayerState>();
@@ -96,7 +95,7 @@ public class SpiderAI : MonoBehaviour, IDamageable
         UpdateAnimation();
     }
 
-    // --- Movement Logic: Replaces Patrol ---
+    // Movement Logic replaces patrol
 
     void Wander()
     {
@@ -128,7 +127,7 @@ public class SpiderAI : MonoBehaviour, IDamageable
         }
     }
 
-    // --- Combat Logic ---
+    // Combat Logic
 
     void TryAttackPlayer()
     {
@@ -175,7 +174,6 @@ public class SpiderAI : MonoBehaviour, IDamageable
         {
             Vector3 direction = agent.velocity.normalized;
             Quaternion targetRotation = Quaternion.LookRotation(direction);
-            // Spiders often don't need a rotation offset like goblins
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
         }
     }
@@ -189,7 +187,7 @@ public class SpiderAI : MonoBehaviour, IDamageable
         animator.SetBool("IsWalking", speed > 0.1f && !agent.isStopped);
     }
 
-    // --- IDamageable Implementation ---
+    // IDamageable Implementation
 
     public void TakeDamage(float damage)
     {

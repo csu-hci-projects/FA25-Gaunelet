@@ -106,7 +106,7 @@ public class GhostAI : MonoBehaviour, IDamageable
         UpdateAnimation();
     }
 
-    // --- Combat Logic ---
+    // Combat Logic
 
     void TryAttackPlayer()
     {
@@ -146,7 +146,7 @@ public class GhostAI : MonoBehaviour, IDamageable
         agent.SetDestination(player.position);
     }
 
-    // --- Patrol Logic ---
+    // Patrol Logic
     void Patrol()
     {
         agent.speed = patrolSpeed; 
@@ -207,14 +207,13 @@ public class GhostAI : MonoBehaviour, IDamageable
         animator.SetBool("IsWalking", speed > 0.1f && !agent.isStopped);
     }
 
-    // --- IDamageable Implementation (Magic Immunity Logic) ---
+    // IDamageable Implementation
 
     public void TakeDamage(float damage)
     {
         if (isDead) return;
 
-        // NEW LOGIC: Block any damage that is greater than or equal to the threshold.
-        // This assumes high-damage hits are physical (sword) and low-damage hits are magic.
+        // Block any damage that is greater than or equal to the threshold.
         if (damage >= physicalDamageImmunityThreshold)
         {
             Debug.Log($"[Ghost] Physical damage ({damage:F2}HP) BLOCKED! Damage >= Threshold ({physicalDamageImmunityThreshold:F2}HP).");

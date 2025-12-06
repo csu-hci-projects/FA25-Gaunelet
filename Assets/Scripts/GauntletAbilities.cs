@@ -76,7 +76,8 @@ public class GauntletAbilities : MonoBehaviour
             Debug.LogError("Player Renderer not assigned! Invincible visuals will not work.");
         }
 
-        StopAllEmitters(true);
+        // Initialize by stopping all emitters
+        ClearAllEmittersVFX();
     }
 
     void Start()
@@ -84,6 +85,7 @@ public class GauntletAbilities : MonoBehaviour
         // Load or Initialize ability states based on the scene index
         InitializeAbilityStates(); 
         
+        // Ensure the current ability is one that is enabled and set initial visuals
         EnsureCurrentAbilityIsEnabled(true);
     }
 
@@ -144,16 +146,25 @@ public class GauntletAbilities : MonoBehaviour
             isInvincibleEnabled = true;
         }
 
-        // 3. Load Persistence ONLY for abilities not guaranteed by scene minimums.
-        // This primarily handles the Light ability, which is an optional final unlock.
-        // Invincible persistence is now successfully bypassed by the 'sceneIndex == 1' block above.
+        // 3. Load Persistence ONLY for abilities that are OPTIONAL and PERMANENTLY UNLOCKED.
         
         // --- Persistence Check: Light (Ability 4) ---
-        int lightInt = PlayerPrefs.GetInt(LightKey, 0); 
-        if (lightInt == 1)
+        // Light should ONLY be loaded from persistence in Scene 3 or higher.
+        // In Scene 2, it must be acquired via pickup regardless of prior unlocks.
+        if (sceneIndex >= 3)
         {
-            isLightEnabled = true;
-            Debug.Log("[Gauntlet Load] Light loaded from persistence (unlocked).");
+            int lightInt = PlayerPrefs.GetInt(LightKey, 0); 
+            if (lightInt == 1)
+            {
+                isLightEnabled = true;
+                Debug.Log("[Gauntlet Load] Light loaded from persistence (unlocked).");
+            }
+        }
+        else
+        {
+            // For Scene 1 and 2, isLightEnabled remains false from step 1, 
+            // ensuring it must be acquired via pickup.
+            Debug.Log($"[Gauntlet Load] Light persistence skipped for Scene {sceneIndex}. Must be acquired in-scene.");
         }
     }
     
@@ -209,6 +220,7 @@ public class GauntletAbilities : MonoBehaviour
             case AbilityType.Ice: isIceEnabled = isEnabled; break;
             case AbilityType.Invincible: isInvincibleEnabled = isEnabled; break;
             case AbilityType.Light: isLightEnabled = isEnabled; break;
+            case AbilityType.None: break; // None is never enabled
         }
         // When called from Scene 0, this saves the state as 0 for persistence reset
         SaveAbilityState(ability, isEnabled); 
@@ -238,7 +250,18 @@ public class GauntletAbilities : MonoBehaviour
         if (gauntletActive && !wasGauntletActive)
         {
             gauntletActivateTime = Time.time;
+            // When RMB is first pressed, ensure we show the visual for the selected ability
+            ApplySpellVisuals(currentAbility, true);
         }
+        
+        // When Gauntlet Mode is released (RMB released)
+        if (!gauntletActive && wasGauntletActive)
+        {
+             // When gauntlet is released, we explicitly stop all visuals immediately
+             // NOTE: Since ApplySpellVisuals no longer clears VFX, this only reverts the material.
+             ApplySpellVisuals(AbilityType.None, false); 
+        }
+
 
         // 1. Ability Cycling (E key)
         if (Input.GetKeyDown(KeyCode.E))
@@ -319,12 +342,15 @@ public class GauntletAbilities : MonoBehaviour
     }
 
     // --- Core Ability Methods ---
-
-    void StopAllEmitters(bool disableObjects = false)
+    
+    /// <summary>
+    /// Aggressively stops and clears all particles. Used for cycling or cleanup.
+    /// </summary>
+    void ClearAllEmittersVFX()
     {
-        fireEmitter?.Stop();
-        iceEmitter?.Stop();
-        lightEmitter?.Stop();
+        fireEmitter?.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        iceEmitter?.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        lightEmitter?.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
     }
 
     float GetCurrentChannelDrainRate()
@@ -366,30 +392,59 @@ public class GauntletAbilities : MonoBehaviour
 
         isCasting = true;
         
+        // IMPORTANT: We MUST call ApplySpellVisuals here to ensure the material is correct.
+        ApplySpellVisuals(currentAbility, true); 
+
         switch (currentAbility)
         {
             case AbilityType.Fire:
+                // 1. Aggressively clear ALL old VFX before starting this channeled beam
+                ClearAllEmittersVFX();
                 Debug.Log("[Gauntlet] Fire Channel START!");
+                // Explicitly check for null and play
+                if (fireEmitter == null) { Debug.LogError("Fire Emitter is not assigned in the Inspector!"); return; }
                 AimEmitterAtModelForward(fireEmitter); 
-                fireEmitter?.Play(); 
+                fireEmitter.Play(); 
                 break;
+                
             case AbilityType.Ice:
+                // 1. Aggressively clear ALL old VFX before starting this channeled beam
+                ClearAllEmittersVFX();
                 Debug.Log("[Gauntlet] Ice Channel START!");
+                // Explicitly check for null and play
+                if (iceEmitter == null) { Debug.LogError("Ice Emitter is not assigned in the Inspector!"); return; }
                 AimEmitterAtModelForward(iceEmitter); 
-                iceEmitter?.Play(); 
+                iceEmitter.Play(); 
                 break;
+                
             case AbilityType.Light:
-                Debug.Log("[Gauntlet] Light Channel START!");
+                // DO NOT call ClearAllEmittersVFX here. This allows previous Light particles to persist.
+                Debug.Log("[Gauntlet] Light Channel START! Previous lights will persist.");
+                // Explicitly check for null and play
+                if (lightEmitter == null) { Debug.LogError("Light Emitter is not assigned in the Inspector! Check the VFX Emitters section."); return; }
                 AimEmitterAtModelForward(lightEmitter);
-                lightEmitter?.Play();
+                lightEmitter.Play();
                 break;
         }
     }
 
     void StopCast()
     {
+        if (!isCasting) return;
+
         isCasting = false;
-        StopAllEmitters();
+        
+        // --- Custom Stop Logic for Light ---
+        if (currentAbility == AbilityType.Light)
+        {
+            // Only stop emitting new particles, allow existing ones to finish their lifetime
+            lightEmitter?.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        }
+        else
+        {
+            // For Fire/Ice (channeled damage), clear them immediately
+            ClearAllEmittersVFX();
+        }
 
         Debug.Log($"[Gauntlet] {currentAbility} Channel STOP!");
     }
@@ -420,6 +475,9 @@ public class GauntletAbilities : MonoBehaviour
             return;
         }
 
+        // Must stop any active channeling VFX before activating Invincibility visual
+        if (isCasting) StopCast(); 
+        
         if (playerRenderer != null && invincibleMaterial != null)
         {
             // 1. Get the number of materials slots to fill
@@ -534,10 +592,13 @@ public class GauntletAbilities : MonoBehaviour
                 
                 Debug.Log($"[Gauntlet] Ability switched: {previous} -> {currentAbility}");
                 
-                if (gauntletActive)
-                {
-                    ApplySpellVisuals(currentAbility);
-                }
+                // 1. Aggressively clear old VFX before applying new visual
+                ClearAllEmittersVFX(); 
+                
+                // CRUCIAL: Call ApplySpellVisuals to change the player's held material 
+                // and ensure the correct emitter is ready.
+                ApplySpellVisuals(currentAbility, true); 
+
                 return;
             }
         }
@@ -545,22 +606,45 @@ public class GauntletAbilities : MonoBehaviour
         Debug.LogWarning("[Gauntlet] No available ability to switch to!");
     }
     
+    /// <summary>
+    /// Handles applying the ability's material to the player model when the gauntlet is active.
+    /// NOTE: This function no longer clears VFX. Clearing is now handled in StartCast() and CycleAbility().
+    /// </summary>
     void ApplySpellVisuals(AbilityType ability, bool force = false)
     {
-        if (!gauntletActive && !force) return;
+        // If we are not actively holding RMB, only proceed if forced (e.g., in Start() or Cycle())
+        if (!gauntletActive && !force && ability != AbilityType.None) return;
 
-        StopAllEmitters(); 
+        Material targetMaterial = null;
 
-        // NOTE: The visual switching logic is currently empty here, 
-        // but this is where you would activate the visual feedback for the selected ability.
         if (ability == AbilityType.Fire)
         {
+             targetMaterial = fireMaterial;
         }
         else if (ability == AbilityType.Ice)
         {
+             targetMaterial = iceMaterial;
         }
         else if (ability == AbilityType.Light)
         {
+             targetMaterial = lightMaterial;
+        }
+        else if (ability == AbilityType.None)
+        {
+             // When the gauntlet is deactivated (RMB released), we return to the original material
+             targetMaterial = originalPlayerMaterials.Length > 0 ? originalPlayerMaterials[0] : null; 
+        }
+
+        // Apply the material (assuming the Gauntlet or Player model has a single, main material)
+        if (targetMaterial != null && playerRenderer != null && !isInvincibleActive)
+        {
+             // Only set the first material slot for the visual representation
+             Material[] currentMaterials = playerRenderer.materials;
+             if (currentMaterials.Length > 0)
+             {
+                 currentMaterials[0] = targetMaterial;
+                 playerRenderer.materials = currentMaterials;
+             }
         }
     }
 }
