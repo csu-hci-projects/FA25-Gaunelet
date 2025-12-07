@@ -126,6 +126,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3964a3cac7b2a9449a2a15441e19519a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AbilityPickup
-  abilityToEnable: 0
+  abilityToEnable: 1
   pickupMessage: Gauntlet spell Fire unlocked! This spell has short range but deals
     lots of damage. Also useful for burning away dry brown bramble in the forest.

@@ -6,11 +6,17 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/TitleScreen.unity
+    guid: e6040129408d45944ae53988beef4616
+  - enabled: 1
     path: Assets/Scenes/Woodland.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
     path: Assets/Scenes/Dungeon.unity
     guid: c378a4fba0efa9a4b80503e7d56f356e
+  - enabled: 1
+    path: Assets/Scenes/Labyrinth.unity
+    guid: f93b25054f0e6994dabcb618c8b30a7b
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0

@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Sign
+  - Canvas
   layers:
   - Default
   - TransparentFX

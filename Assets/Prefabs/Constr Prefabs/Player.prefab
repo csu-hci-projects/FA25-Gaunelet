@@ -73,7 +73,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10308, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: e823cd5b5d27c0f4b8256e7c12ee3e6d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -131,6 +131,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerControls
   moveSpeed: 7
   modelTransform: {fileID: 4517921883428711545}
+  gauntletYOffset: 0.08
   rotationSmoothSpeed: 10
   blockMoveSpeedMultiplier: 0.5
   aimRotationSpeed: 20
@@ -211,12 +212,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fbe2d259696b7a43b7b126337bc7d10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GauntletAbilities
-  invincibilityDuration: 3
-  magicDrainRate: 10
+  fireDrainRate: 10
+  iceDrainRate: 10
+  lightDrainRate: 5
+  invincibleDrainRate: 15
   isFireEnabled: 1
   isIceEnabled: 1
   isInvincibleEnabled: 0
   isLightEnabled: 0
+  gauntletReadyDelay: 0.5
   fireEmitter: {fileID: 3070269241589541401}
   iceEmitter: {fileID: 1687643457172121283}
   lightEmitter: {fileID: 3070269241589541401}

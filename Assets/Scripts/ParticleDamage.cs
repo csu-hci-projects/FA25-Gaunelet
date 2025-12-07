@@ -9,8 +9,26 @@ public class ParticleDamage : MonoBehaviour
 {
     // The amount of damage a single particle hit applies.
     [Header("Damage Settings")]
-    [Tooltip("Damage applied per particle collision.")]
+    [Tooltip("Damage applied per particle collision (this is the base damage).")]
     public float damageAmount = 1f;
+
+    // CRITICAL: Reference to the player's state for reading damage multipliers
+    private PlayerState playerState;
+
+    void Start()
+    {
+        // 1. Find the PlayerState component
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            playerState = player.GetComponent<PlayerState>();
+        }
+
+        if (playerState == null)
+        {
+            Debug.LogError("ParticleDamage failed to find 'PlayerState' on an object tagged 'Player'. Magic damage multiplier will not apply!");
+        }
+    }
 
     /// <summary>
     /// This is a special Unity function called when a particle from this system hits a collider.
@@ -28,17 +46,27 @@ public class ParticleDamage : MonoBehaviour
         }
 
         // MANDATORY DEBUG LOG: This will confirm if the OnParticleCollision function is firing.
-        Debug.Log($"[ParticleDamage] Collision Registered: {other.name}");
+        // Debug.Log($"[ParticleDamage] Collision Registered: {other.name}");
 
-        // 2. Check if the hit object implements the IDamageable interface (e.g., Fire.cs)
+        // 2. Calculate the final damage (Base * Multiplier)
+        float finalDamage = damageAmount;
+        if (playerState != null)
+        {
+            float multiplier = playerState.GetMagicDamageMultiplier();
+            finalDamage = damageAmount * multiplier;
+            // Uncomment this line to see the boost in the console!
+            // Debug.Log($"[ParticleDamage] Magic Damage: Base({damageAmount}) * Multiplier({multiplier:F2}) = Final({finalDamage:F2})");
+        }
+        
+        // 3. Check if the hit object implements the IDamageable interface (e.g., Fire.cs)
         IDamageable damageable = other.GetComponent<IDamageable>();
 
         if (damageable != null && damageable.IsAlive())
         {
-            // If it's damageable, apply the damage.
-            damageable.TakeDamage(damageAmount);
+            // If it's damageable, apply the calculated final damage.
+            damageable.TakeDamage(finalDamage);
             
-            Debug.Log($"[ParticleDamage] Found IDamageable on {other.name}. Calling TakeDamage.");
+            // Debug.Log($"[ParticleDamage] Found IDamageable on {other.name}. Calling TakeDamage.");
         }
     }
 }

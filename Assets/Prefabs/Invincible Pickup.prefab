@@ -126,7 +126,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3964a3cac7b2a9449a2a15441e19519a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AbilityPickup
-  abilityToEnable: 2
+  abilityToEnable: 3
   pickupMessage: Gauntlet spell Invincible unlocked! The dark metal material of the
     gauntlet covers you and makes you impervious to all damage! But be careful it
     drains magic quickly.

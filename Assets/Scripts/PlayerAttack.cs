@@ -3,9 +3,12 @@ using UnityEngine;
 public class PlayerAttack : MonoBehaviour
 {
     private Animator animator;
+    private PlayerState playerState; // Reference to the PlayerState component
 
     [Header("Attack Settings")]
-    [SerializeField] private float attackDamage = 50f;
+    [Tooltip("This field is no longer used for damage calculation; damage is now sourced from PlayerState.")]
+    [SerializeField] private float attackDamage = 50f; // Kept for reference, but overridden
+
     [SerializeField] private float attackRange = 2.5f;
     [SerializeField] private float attackDelay = 0.3f; // Delay before damage is applied (animation timing)
     [SerializeField] private float attackCooldown = 1f; // Time between attacks
@@ -19,7 +22,16 @@ public class PlayerAttack : MonoBehaviour
     void Start()
     {
         // Get the Animator component from the character model
-        animator = GetComponentInChildren<Animator>(); 
+        animator = GetComponentInChildren<Animator>();
+        
+        // CRITICAL: Get the PlayerState component from this GameObject
+        playerState = GetComponent<PlayerState>();
+        if (playerState == null)
+        {
+            Debug.LogError("PlayerAttack requires a PlayerState component on the same GameObject to calculate damage.");
+            // Disable the script to prevent errors if the component is missing
+            enabled = false; 
+        }
     }
 
     void Update()
@@ -52,13 +64,22 @@ public class PlayerAttack : MonoBehaviour
 
     void DealDamage()
     {
+        // --- CALCULATE DAMAGE USING PLAYERSTATE ---
+        // This is the core fix. Damage is now dynamic and persistent.
+        float baseDamage = playerState.GetBaseSwordDamage();
+        float multiplier = playerState.GetSwordDamageMultiplier();
+        float finalDamage = baseDamage * multiplier;
+
+        Debug.Log($"[PlayerAttack] Calculating damage: Base({baseDamage}) * Multiplier({multiplier:F2}) = Final({finalDamage:F2})");
+        // ------------------------------------------
+
         Collider[] hits;
         
         // Find all colliders in attack range (using layer mask)
         if (enemyLayer.value == 0)
         {
              // Fallback: Check everything if layer mask is not set
-            hits = Physics.OverlapSphere(transform.position, attackRange);
+             hits = Physics.OverlapSphere(transform.position, attackRange);
         }
         else
         {
@@ -75,7 +96,8 @@ public class PlayerAttack : MonoBehaviour
                 // Ensure we don't hit ourselves
                 if (hit.transform == transform) continue; 
                 
-                damageable.TakeDamage(attackDamage);
+                // Apply the calculated final damage
+                damageable.TakeDamage(finalDamage);
             }
         }
     }

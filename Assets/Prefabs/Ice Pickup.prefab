@@ -126,5 +126,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3964a3cac7b2a9449a2a15441e19519a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AbilityPickup
-  abilityToEnable: 1
-  pickupMessage: Gauntlet spell Ice unlocked! Press [SPACE] to continue.
+  abilityToEnable: 2
+  pickupMessage: Gauntlet spell Ice unlocked! Deals less damage than Fire but has
+    a longer range. Also use it to combat the mystical fires that burn in the forest.

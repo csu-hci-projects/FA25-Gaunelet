@@ -28745,6 +28745,10 @@ PrefabInstance:
       propertyPath: isInvincibleEnabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9146627656328814522, guid: 28efd9deb0351014bb96b9fed7a6edd5, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: e823cd5b5d27c0f4b8256e7c12ee3e6d, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
