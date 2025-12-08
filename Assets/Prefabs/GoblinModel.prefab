@@ -244,7 +244,7 @@ MonoBehaviour:
   reachDistance: 2
   rotationOffset: 180
   player: {fileID: 0}
-  chaseRange: 8
+  chaseRange: 10
   attackRange: 2
   attackCooldown: 2
   attackDamage: 10

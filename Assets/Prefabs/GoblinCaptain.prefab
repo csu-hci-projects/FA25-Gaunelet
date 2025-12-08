@@ -55,7 +55,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2235486217022656973}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -1, z: -0, w: 0.0000029504295}
+  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
   m_LocalPosition: {x: -208.93, y: 0, z: 98.08}
   m_LocalScale: {x: 1.5195048, y: 1.5195048, z: 1.5195048}
   m_ConstrainProportionsScale: 0
@@ -252,8 +252,8 @@ MonoBehaviour:
   attackCooldown: 1.5
   attackDamage: 15
   attackDelay: 0.3
-  maxHP: 70
-  currentHP: 70
+  maxHP: 100
+  currentHP: 100
   deathDestroyDelay: 3
 --- !u!65 &6937478752274368742
 BoxCollider:

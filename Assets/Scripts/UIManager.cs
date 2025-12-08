@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI; 
-using TMPro; // <-- ADD THIS for TextMeshPro
+using TMPro; 
 
 public class UIManager : MonoBehaviour
 {
@@ -11,18 +11,26 @@ public class UIManager : MonoBehaviour
     public Slider healthSlider; // Drag your HealthBarSlider here
     public Slider magicSlider;  // Drag your MagicBarSlider here
     
+    [Header("Spell UI")]
+    [Tooltip("The Text component used to display the currently active Gauntlet spell.")]
+    public TextMeshProUGUI activeSpellText; // NEW: Drag your new Text object here
+
     [Header("Pickup Message UI")]
     [Tooltip("The panel containing the message text. Used to toggle visibility.")]
     public GameObject messagePanel; 
     [Tooltip("The Text component (TextMeshProUGUI preferred) used to display the message content.")]
-    public TextMeshProUGUI messageText; // <-- CHANGED from 'Text' to 'TextMeshProUGUI'
+    public TextMeshProUGUI messageText; 
     
     [Header("Player Reference")]
     public PlayerState playerState; // Drag the GameObject with PlayerState here
 
     private bool isMessageVisible = false;
-    // NEW: Stores the object to be destroyed when the player dismisses the message.
     private GameObject objectToDestroyOnDismiss; 
+    
+    // Cache the abilities script to read the current spell
+    private GauntletAbilities playerAbilities;
+    // Track the last seen ability to prevent updating text every single frame
+    private AbilityType lastKnownAbility = AbilityType.None; 
 
     void Awake()
     {
@@ -44,16 +52,23 @@ public class UIManager : MonoBehaviour
             Debug.LogError("PlayerState reference is missing in UIManager!");
             return;
         }
+        
+        // --- NEW: Get the GauntletAbilities component from the player ---
+        playerAbilities = playerState.GetComponent<GauntletAbilities>();
+        if (playerAbilities == null)
+        {
+            Debug.LogError("UIManager found PlayerState but could not find GauntletAbilities on the same object.");
+        }
+
         if (healthSlider == null || magicSlider == null)
         {
             Debug.LogError("One or both UI Sliders are missing in UIManager!");
             return;
         }
-        // Note: TMPro components might require a check for null here if you are getting errors.
+        
         if (messagePanel == null || messageText == null)
         {
             Debug.LogError("Pickup Message UI references (Panel or Text) are missing in UIManager! Assign them in the Inspector.");
-            // We won't return yet, as the core functionality still needs to initialize
         }
         
         // Ensure the message panel is hidden at the start
@@ -70,6 +85,9 @@ public class UIManager : MonoBehaviour
         magicSlider.maxValue = playerState.GetMaxMagic(); 
         magicSlider.value = playerState.GetCurrentMagic(); 
         
+        // Force initial UI update for the spell text
+        UpdateActiveSpellUI(true);
+
         Debug.Log("UI Manager initialized: HP and Magic sliders set to starting values.");
     }
 
@@ -79,8 +97,10 @@ public class UIManager : MonoBehaviour
         UpdateHealthBar(playerState.GetCurrentHP());
         UpdateMagicBar(playerState.GetCurrentMagic());
         
+        // --- NEW: Update Spell Text ---
+        UpdateActiveSpellUI();
+        
         // Check for message dismissal: Space key
-        // NOTE: Input.GetKeyDown still works even if Time.timeScale is 0.
         if (isMessageVisible && Input.GetKeyDown(KeyCode.Space))
         {
             HidePickupMessage();
@@ -95,6 +115,35 @@ public class UIManager : MonoBehaviour
     public void UpdateMagicBar(float currentMagic)
     {
         magicSlider.value = currentMagic;
+    }
+    
+    /// <summary>
+    /// Checks the player's current ability and updates the UI text if it has changed.
+    /// </summary>
+    private void UpdateActiveSpellUI(bool forceUpdate = false)
+    {
+        if (playerAbilities == null || activeSpellText == null) return;
+
+        // Get the current ability from the script
+        AbilityType current = playerAbilities.GetCurrentAbility();
+
+        // Only update the text if the ability has changed since the last frame
+        if (current != lastKnownAbility || forceUpdate)
+        {
+            string spellName = current.ToString();
+            
+            // Handle the "None" case specifically
+            if (current == AbilityType.None || !playerAbilities.IsAbilityEnabled(current))
+            {
+                // This covers the scenario where GauntletAbilities defaults to 'None' or 
+                // if the currently selected ability is somehow disabled.
+                spellName = "None";
+            }
+            
+            // Set the final text string
+            activeSpellText.text = $"Current Spell: {spellName}";
+            lastKnownAbility = current;
+        }
     }
     
     /// <summary>

@@ -130,4 +130,5 @@ MonoBehaviour:
   grantMaxMagic: 0
   grantDoubleSwordDamage: 1
   grantMagicDamageIncrease: 0
-  pickupMessage: Your sword damage has permanently doubled!
+  pickupMessage: Your sword damage has permanently doubled! Health and Magic have
+    also been fully restored!
