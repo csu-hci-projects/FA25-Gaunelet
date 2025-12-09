@@ -2055,8 +2055,8 @@ MonoBehaviour:
   attackDamage: 8
   attackDelay: 0.5
   chaseSpeed: 4
-  maxHP: 40
-  currentHP: 40
+  maxHP: 50
+  currentHP: 50
   deathDestroyDelay: 2
 --- !u!195 &8244578704030851880
 NavMeshAgent:

@@ -1,19 +1,23 @@
 using UnityEngine;
 using UnityEngine.UI; 
 using TMPro; 
+using System.Collections; // Necessary for the Coroutine
 
 public class UIManager : MonoBehaviour
 {
     // Singleton pattern for easy static access from other scripts
     public static UIManager Instance { get; private set; }
+    
+    // Duration for non-interactive messages (like DestroyOnDestroy success)
+    private const float NotificationDuration = 3.0f; 
 
     [Header("UI References")]
     public Slider healthSlider; // Drag your HealthBarSlider here
-    public Slider magicSlider;  // Drag your MagicBarSlider here
+    public Slider magicSlider;  // Drag your MagicBarSlider here
     
     [Header("Spell UI")]
     [Tooltip("The Text component used to display the currently active Gauntlet spell.")]
-    public TextMeshProUGUI activeSpellText; // NEW: Drag your new Text object here
+    public TextMeshProUGUI activeSpellText; 
 
     [Header("Pickup Message UI")]
     [Tooltip("The panel containing the message text. Used to toggle visibility.")]
@@ -31,6 +35,9 @@ public class UIManager : MonoBehaviour
     private GauntletAbilities playerAbilities;
     // Track the last seen ability to prevent updating text every single frame
     private AbilityType lastKnownAbility = AbilityType.None; 
+    
+    // Reference to the scaler script for initial UI sync
+    private StatMeterScaler scaler;
 
     void Awake()
     {
@@ -47,13 +54,14 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
+        // --- Reference Checks ---
         if (playerState == null)
         {
             Debug.LogError("PlayerState reference is missing in UIManager!");
             return;
         }
         
-        // --- NEW: Get the GauntletAbilities component from the player ---
+        // --- Get the GauntletAbilities component from the player ---
         playerAbilities = playerState.GetComponent<GauntletAbilities>();
         if (playerAbilities == null)
         {
@@ -77,19 +85,80 @@ public class UIManager : MonoBehaviour
             messagePanel.SetActive(false);
         }
 
-        // --- HEALTH BAR INITIALIZATION ---
-        healthSlider.maxValue = playerState.GetMaxHP(); 
-        healthSlider.value = playerState.GetCurrentHP(); 
+        // 1. --- FIND AND CACHE SCALER FOR SYNC (Using the reliable direct GetComponent method) ---
+        scaler = GetComponent<StatMeterScaler>(); 
         
-        // --- MAGIC BAR INITIALIZATION ---
-        magicSlider.maxValue = playerState.GetMaxMagic(); 
-        magicSlider.value = playerState.GetCurrentMagic(); 
+        if (scaler != null)
+        {
+             Debug.Log("[UIManager] Successfully retrieved StatMeterScaler from this GameObject.");
+        }
+        else
+        {
+             Debug.LogError("[UIManager] StatMeterScaler component is missing from the Canvas!");
+        }
+
+
+        // 2. --- INITIALIZATION FOR LOGGING ONLY ---
+        // We set the MAX VALUE in UpdateHealthBar now, so only use current values for initial log and setup.
+        float maxHP = playerState.GetMaxHP();
+        float currentHP = playerState.GetCurrentHP();
+        
+        // Initial value is still necessary for the first frame before Update runs.
+        healthSlider.value = currentHP; 
+        
+        // The log that confirms the data is correctly read
+        Debug.Log($"[UIManager] Health Init: Max={maxHP} (Initial PlayerState), Current={healthSlider.value}."); 
+        
+        // 3. --- MAGIC BAR INITIALIZATION (Initial value set here, max value set per frame in UpdateMagicBar) ---
+        float maxMagic = playerState.GetMaxMagic();
+        float currentMagic = playerState.GetCurrentMagic();
+        
+        // Initial value is still necessary for the first frame before Update runs.
+        magicSlider.value = currentMagic; 
+        
+        Debug.Log($"[UIManager] Magic Init: Max={maxMagic} (Initial PlayerState), Current={magicSlider.value}."); 
+
+        // 4. --- DELAYED VISUAL SYNC (Keep Coroutine for visual bar resizing) ---
+        if (scaler != null)
+        {
+            StartCoroutine(SyncMeterVisualsDelayed(maxHP, maxMagic));
+        }
         
         // Force initial UI update for the spell text
         UpdateActiveSpellUI(true);
 
         Debug.Log("UI Manager initialized: HP and Magic sliders set to starting values.");
     }
+    
+    /// <summary>
+    /// Delays the StatMeterScaler sync by one frame to ensure the visual resize happens 
+    /// AFTER the UI layout system has completed its initial frame update, resolving the timing conflict.
+    /// </summary>
+    private IEnumerator SyncMeterVisualsDelayed(float maxHP, float maxMagic)
+    {
+        // Wait one frame. This is the most reliable way to ensure the UI is stable.
+        yield return null; 
+
+        if (scaler != null)
+        {
+            // Check for Max HP Upgrade
+            if (maxHP > 100f) // Assuming 100f is the base HP value
+            {
+                // This call should physically resize the health bar visual element
+                scaler.OnHealthUpgradePickedUp();
+                Debug.Log("[UIManager] DELAYED SYNC: Health Meter size updated via scaler.");
+            }
+
+            // Check for Max Magic Upgrade
+            if (maxMagic > 100f) // Assuming 100f is the base Magic value
+            {
+                // This call should physically resize the magic bar visual element
+                scaler.OnMagicUpgradePickedUp();
+                Debug.Log("[UIManager] DELAYED SYNC: Magic Meter size updated via scaler.");
+            }
+        }
+    }
+
 
     void Update()
     {
@@ -97,23 +166,39 @@ public class UIManager : MonoBehaviour
         UpdateHealthBar(playerState.GetCurrentHP());
         UpdateMagicBar(playerState.GetCurrentMagic());
         
-        // --- NEW: Update Spell Text ---
+        // --- Update Spell Text ---
         UpdateActiveSpellUI();
         
-        // Check for message dismissal: Space key
-        if (isMessageVisible && Input.GetKeyDown(KeyCode.Space))
+        // Check for message dismissal: Space key (Only affects the PAUSING messages)
+        if (isMessageVisible && Time.timeScale == 0f && Input.GetKeyDown(KeyCode.Space))
         {
             HidePickupMessage();
         }
     }
 
+    /// <summary>
+    /// **FIX:** Enforces the correct maxValue every frame before setting the current value.
+    /// This prevents any external script from resetting maxValue back to the Inspector default (100).
+    /// </summary>
     public void UpdateHealthBar(float currentHP)
     {
+        // 1. Force the maxValue to the true maximum from PlayerState every frame.
+        healthSlider.maxValue = playerState.GetMaxHP(); 
+
+        // 2. Set the current value.
         healthSlider.value = currentHP;
     }
 
+    /// <summary>
+    /// **FIX:** Enforces the correct maxValue every frame before setting the current value.
+    /// This prevents any external script from resetting maxValue back to the Inspector default (100).
+    /// </summary>
     public void UpdateMagicBar(float currentMagic)
     {
+        // 1. Force the maxValue to the true maximum from PlayerState every frame.
+        magicSlider.maxValue = playerState.GetMaxMagic();
+
+        // 2. Set the current value.
         magicSlider.value = currentMagic;
     }
     
@@ -147,12 +232,53 @@ public class UIManager : MonoBehaviour
     }
     
     /// <summary>
+    /// Displays a message on the UI for a short duration without pausing the game.
+    /// Used for simple notifications like when a barrier is destroyed.
+    /// </summary>
+    public void ShowNotificationMessage(string message)
+    {
+        if (messagePanel == null || messageText == null) return;
+        
+        // Ensure we stop any previous notification coroutine to prevent overlap
+        StopCoroutine(nameof(HideMessageAfterDelay));
+        
+        messageText.text = message; 
+        messagePanel.SetActive(true);
+        isMessageVisible = true; 
+        
+        // Start the timer to hide the message
+        StartCoroutine(HideMessageAfterDelay(NotificationDuration));
+        
+        Debug.Log($"[UI] Displaying notification: {message}. Game running.");
+    }
+    
+    /// <summary>
+    /// Coroutine to wait for a delay and then hide the message panel.
+    /// Uses WaitForSecondsRealtime so it functions correctly even if Time.timeScale is modified elsewhere.
+    /// </summary>
+    private IEnumerator HideMessageAfterDelay(float delay)
+    {
+        yield return new WaitForSecondsRealtime(delay);
+        
+        // Only hide if the message wasn't replaced by an interactive message
+        if (isMessageVisible && Time.timeScale != 0f) 
+        {
+            messagePanel.SetActive(false);
+            isMessageVisible = false;
+            Debug.Log("[UI] Notification message hidden.");
+        }
+    }
+
+    /// <summary>
     /// Displays a message on the UI, pauses the game, and schedules an object for destruction 
     /// upon message dismissal. Called by triggers like DestroyOnTrigger.
     /// </summary>
     public void DisplayActionMessage(string message, GameObject targetToDestroy)
     {
         if (isMessageVisible || messagePanel == null || messageText == null) return;
+        
+        // Stop any running notification coroutine, as this is an interactive message
+        StopCoroutine(nameof(HideMessageAfterDelay)); 
         
         // Set the object to be destroyed when the message is dismissed
         objectToDestroyOnDismiss = targetToDestroy;
@@ -170,6 +296,7 @@ public class UIManager : MonoBehaviour
     
     /// <summary>
     /// Displays a message on the UI. Called by AbilityPickup.cs (or old systems).
+    /// This uses the Action Message system, pausing the game until dismissed by Space bar.
     /// </summary>
     public void DisplayPickupMessage(string message)
     {

@@ -244,13 +244,13 @@ MonoBehaviour:
   reachDistance: 2
   rotationOffset: 180
   player: {fileID: 0}
-  chaseRange: 10
-  attackRange: 2
+  chaseRange: 12
+  attackRange: 3
   attackCooldown: 2
-  attackDamage: 10
+  attackDamage: 15
   attackDelay: 0.4
-  maxHP: 60
-  currentHP: 60
+  maxHP: 80
+  currentHP: 80
   deathDestroyDelay: 3
 --- !u!65 &2530273693258788155
 BoxCollider:

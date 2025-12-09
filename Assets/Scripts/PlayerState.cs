@@ -1,7 +1,9 @@
 using UnityEngine;
 using System; 
-using UnityEngine.SceneManagement; // Included for good practice, even if not explicitly used for reset here
+using UnityEngine.SceneManagement; 
+using System.Collections; 
 
+// The PlayerState class now handles persistence, stats, and health/magic state only.
 public class PlayerState : MonoBehaviour, IDamageable
 {
     // --- Persistence Keys for PowerUps ---
@@ -11,13 +13,20 @@ public class PlayerState : MonoBehaviour, IDamageable
     private const string MagicDamageMultiplierKey = "PowerUp_MagicDamageMultiplier";
 
     [Header("Health & Magic Base Stats")]
-    [SerializeField] private float baseMaxHP = 100f; // Renamed from maxHP
+    [SerializeField] private float baseMaxHP = 100f; 
     [SerializeField] private float currentHP = 100f;
-    [SerializeField] private float baseMaxMagic = 100f; // Renamed from maxMagic
+    [SerializeField] private float baseMaxMagic = 100f; 
     [SerializeField] private float currentMagic = 100f;
-    [SerializeField] private float baseSwordDamage = 15f; // NEW: Base sword damage exposed here
+    [SerializeField] private float baseSwordDamage = 15f; 
 
-    // --- Permanent Power-Up Bonuses (Loaded from Persistence) ---
+    // --- Death Settings ---
+    [Header("Death Settings")]
+    [Tooltip("If enabled, the current scene will be reloaded upon player death (HP <= 0).")]
+    [SerializeField] private bool reloadSceneOnDeath = true; 
+    [Tooltip("The time delay (in seconds) before the scene reloads after death.")]
+    [SerializeField] private float deathReloadDelay = 2.0f; 
+    
+    // --- Player State Core Fields ---
     private float bonusMaxHP = 0f;
     private float bonusMaxMagic = 0f;
     private float swordDamageMultiplier = 1f;
@@ -29,11 +38,16 @@ public class PlayerState : MonoBehaviour, IDamageable
 
     private bool isInvincible = false; 
     private bool isBlocking = false; 
+    private bool isDying = false; // Prevents calling Die() multiple times
+
+    void Awake()
+    {
+        // Simple Awake initialization for PlayerState
+    }
 
     void Start()
     {
         // 1. Load permanent power-up effects from persistence.
-        // If GameManager used PlayerPrefs.DeleteAll(), these will default to 0/1.
         LoadPowerUps();
 
         // 2. Initialize current health and magic to the MAX possible values (Base + Bonus)
@@ -45,11 +59,9 @@ public class PlayerState : MonoBehaviour, IDamageable
 
     void Update()
     {
+        if (isDying) return; 
         RegenerateMagic();
     }
-    
-    // NOTE: The ResetAllPermanentProgress() method has been removed, 
-    // as that responsibility now belongs to GameManager.cs in Scene 0.
 
     /// <summary>
     /// Loads the permanent power-up bonuses from PlayerPrefs.
@@ -80,6 +92,9 @@ public class PlayerState : MonoBehaviour, IDamageable
 
     public void TakeDamage(float damage) 
     {
+        // Check if the player is already dying or dead
+        if (isDying) return; 
+
         // 1. Check for permanent Invincibility (Highest priority)
         if (isInvincible)
         {
@@ -88,8 +103,6 @@ public class PlayerState : MonoBehaviour, IDamageable
         }
         
         // --- Damage Application ---
-
-        // 2. Apply Block Reduction Logic
         float finalDamage = damage;
         if (isBlocking)
         {
@@ -97,13 +110,11 @@ public class PlayerState : MonoBehaviour, IDamageable
             Debug.Log($"[PlayerState: HP] Blocking! Reduced {damage:F2} damage to {finalDamage:F2}.");
         }
         
-        // Ensure damage is positive before applying
         finalDamage = Mathf.Max(0, finalDamage); 
 
         // 3. Apply Damage
         currentHP -= finalDamage;
         
-        // CRITICAL HP DAMAGE DEBUG
         Debug.Log($"[PlayerState: HP] Took **-{finalDamage:F2}** | Current HP: {currentHP:F2}/{GetMaxHP()}");
 
         if (currentHP <= 0)
@@ -115,45 +126,57 @@ public class PlayerState : MonoBehaviour, IDamageable
     
     void Die()
     {
+        if (isDying) return; // Prevent double death execution
+        
+        isDying = true;
         Debug.Log("[PlayerState: HP] **Player has died!**");
-        // TODO: Add death animation, disable controls, reload scene, etc.
+
+        // The PlayerControls script will now check this 'isDying' flag via the public method.
+        
+        if (reloadSceneOnDeath)
+        {
+            StartCoroutine(ReloadSceneAfterDelay());
+        }
+        else
+        {
+            Debug.Log("[PlayerState: Death] Scene reload disabled for debugging.");
+        }
     }
 
-    // --- Power-Up Application Methods (Public API for PowerUp.cs) ---
-    
     /// <summary>
-    /// Increases the player's permanent Max HP and saves the new value. Heals player to the new max.
+    /// Coroutine to wait for the specified delay and then reload the scene.
     /// </summary>
+    private IEnumerator ReloadSceneAfterDelay()
+    {
+        Debug.Log($"[PlayerState: Death] Reloading scene in {deathReloadDelay:F2} seconds...");
+        
+        // Wait for the specified duration
+        yield return new WaitForSeconds(deathReloadDelay); 
+
+        // Get the current scene name and reload it
+        string currentSceneName = SceneManager.GetActiveScene().name;
+        SceneManager.LoadScene(currentSceneName);
+    }
+
+    // --- Power-Up Application Methods ---
     public void ApplyPermanentHPIncrease(float amount)
     {
         bonusMaxHP += amount;
         PlayerPrefs.SetFloat(MaxHPBonusKey, bonusMaxHP);
         PlayerPrefs.Save();
-        
-        // Heal the player to the new max
         currentHP = GetMaxHP(); 
-        
         Debug.Log($"[PlayerState: PowerUp] Permanent Max HP increased by +{amount}. New Max: {GetMaxHP()}.");
     }
 
-    /// <summary>
-    /// Increases the player's permanent Max Magic and saves the new value. Restores magic to the new max.
-    /// </summary>
     public void ApplyPermanentMagicIncrease(float amount)
     {
         bonusMaxMagic += amount;
         PlayerPrefs.SetFloat(MaxMagicBonusKey, bonusMaxMagic);
         PlayerPrefs.Save();
-        
-        // Restore magic to the new max
         currentMagic = GetMaxMagic(); 
-        
         Debug.Log($"[PlayerState: PowerUp] Permanent Max Magic increased by +{amount}. New Max: {GetMaxMagic()}.");
     }
 
-    /// <summary>
-    /// Multiplies the current sword damage multiplier by the given factor and saves the new value.
-    /// </summary>
     public void ApplySwordDamageMultiplier(float factor)
     {
         swordDamageMultiplier *= factor;
@@ -162,9 +185,6 @@ public class PlayerState : MonoBehaviour, IDamageable
         Debug.Log($"[PlayerState: PowerUp] Sword Damage Multiplier applied: x{factor}. New Total Multiplier: x{swordDamageMultiplier:F2}.");
     }
 
-    /// <summary>
-    /// Multiplies the current magic damage multiplier by the given factor and saves the new value.
-    /// </summary>
     public void ApplyMagicDamageMultiplier(float factor)
     {
         magicDamageMultiplier *= factor;
@@ -173,40 +193,23 @@ public class PlayerState : MonoBehaviour, IDamageable
         Debug.Log($"[PlayerState: PowerUp] Magic Damage Multiplier applied: x{factor}. New Total Multiplier: x{magicDamageMultiplier:F2}.");
     }
 
-    // --- Public Restoration Methods (Called by PowerUp.cs) ---
-
-    /// <summary>
-    /// Restores the player's current health to their maximum possible HP (Base + Bonus).
-    /// Called when a PowerUp is collected.
-    /// </summary>
+    // --- Public Restoration Methods ---
     public void RestoreHealthToMax()
     {
         currentHP = GetMaxHP();
         Debug.Log($"[PlayerState: Heal] Health restored to Max: {currentHP:F2}");
     }
 
-    /// <summary>
-    /// Restores the player's current magic to their maximum possible Magic (Base + Bonus).
-    /// Called when a PowerUp is collected.
-    /// </summary>
     public void RestoreMagicToMax()
     {
         currentMagic = GetMaxMagic();
         Debug.Log($"[PlayerState: Magic] Magic restored to Max: {currentMagic:F2}");
     }
 
-
-    // --- Magic Methods (Using updated GetMax methods) ---
-
+    // --- Magic & Combat Methods ---
     public void UseMagic(float amount)
     {
-        float previousMagic = currentMagic;
         currentMagic = Mathf.Clamp(currentMagic - amount, 0f, GetMaxMagic());
-        
-        if (currentMagic < previousMagic)
-        {
-            // Debug.Log($"[PlayerState: Magic] Used {amount:F2} | Current: {currentMagic:F2}/{GetMaxMagic()}");
-        }
     }
 
     public void Heal(float amount)
@@ -222,17 +225,12 @@ public class PlayerState : MonoBehaviour, IDamageable
     }
 
     // --- Getter/Setter Methods ---
-
     public bool IsAlive() => currentHP > 0;
     public float GetCurrentHP() => currentHP;
     public float GetMaxHP() => baseMaxHP + bonusMaxHP; 
     public float GetCurrentMagic() => currentMagic;
     public float GetMaxMagic() => baseMaxMagic + bonusMaxMagic; 
-    
-    // NEW: Expose the base sword damage
     public float GetBaseSwordDamage() => baseSwordDamage; 
-
-    // Expose damage multipliers for other components to read
     public float GetSwordDamageMultiplier() => swordDamageMultiplier;
     public float GetMagicDamageMultiplier() => magicDamageMultiplier;
 
@@ -250,4 +248,7 @@ public class PlayerState : MonoBehaviour, IDamageable
     }
 
     public bool IsBlocking() => isBlocking;
+
+    // Public method to expose isDying status for external scripts like PlayerControls
+    public bool IsDying() => isDying;
 }

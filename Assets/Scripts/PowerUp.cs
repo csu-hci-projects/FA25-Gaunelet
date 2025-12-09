@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement; 
+using System.Collections; // Required for IEnumerator
 
 /// <summary>
 /// Component to be attached to a collectible item that grants permanent,
@@ -36,32 +37,44 @@ public class PowerUp : MonoBehaviour
     // --- Persistence Key for This Specific Pickup ---
     private string pickupPersistenceKey; 
     
-    // --- NEW: Reference to the scaler script ---
+    // --- Reference to the scaler script ---
     private StatMeterScaler scaler;
     
-    void Start()
+    // Changed to IEnumerator to allow waiting a small duration
+    IEnumerator Start()
     {
         // 1. Define the unique key for this pickup
         pickupPersistenceKey = "PowerUp_Collected_" + gameObject.name;
         
         // 2. Find and cache the StatMeterScaler component
-        // Assuming the persistent Canvas is tagged "Canvas" or can be found by name/reference
         GameObject canvasObject = GameObject.FindWithTag("Canvas");
         if (canvasObject != null)
         {
-            scaler = canvasObject.GetComponent<StatMeterScaler>();
+            // We only need the scaler reference here for applying NEW pickups later in ApplyPowerUp,
+            // as the sync logic for previously collected items is now handled by UIManager.
+            scaler = canvasObject.GetComponent<StatMeterScaler>(); 
         }
         
-        if (scaler == null)
-        {
-            Debug.LogError($"[PowerUp] Could not find StatMeterScaler component. Ensure the persistent Canvas object is tagged 'Canvas' and has the component attached.");
-        }
-
         // 3. Normal Persistence Check
         if (PlayerPrefs.GetInt(pickupPersistenceKey, 0) == 1)
         {
-            // Already collected, destroy the object immediately so it doesn't appear
-            Debug.Log($"[PowerUp] '{gameObject.name}' already collected. Destroying instance.");
+            // A. Hide the object immediately so the player doesn't see it flicker.
+            if (GetComponent<Collider>()) GetComponent<Collider>().enabled = false;
+            
+            // Disable all renderers (in case it has children)
+            foreach(var r in GetComponentsInChildren<Renderer>())
+            {
+                r.enabled = false;
+            }
+
+            // B. Wait slightly longer (0.1s). 
+            // We keep this delay to ensure the object is visually hidden before destruction.
+            yield return new WaitForSeconds(0.1f);
+
+            // C. REMOVED: The logic that called scaler.OnHealthUpgradePickedUp() is gone.
+            // UIManager.LateUpdate() now handles the sync on scene load.
+
+            // Already collected, destroy the object
             Destroy(gameObject);
         }
         else
@@ -72,10 +85,16 @@ public class PowerUp : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        // Check if key is null (in case Trigger happens before Start - unlikely but possible)
+        if (string.IsNullOrEmpty(pickupPersistenceKey)) 
+        {
+             pickupPersistenceKey = "PowerUp_Collected_" + gameObject.name;
+        }
+
         // Safety check to prevent double pickup
         if (PlayerPrefs.GetInt(pickupPersistenceKey, 0) == 1) return;
         
-        // Check if the collider belongs to the Player (who should have the PlayerState component)
+        // Check if the collider belongs to the Player
         PlayerState playerState = other.GetComponent<PlayerState>();
         if (playerState != null)
         {
@@ -85,7 +104,7 @@ public class PowerUp : MonoBehaviour
 
     /// <summary>
     /// Applies the selected bonuses to the player's permanent stats via PlayerState and
-    /// triggers the UI message and delayed destruction, including meter scaling if applicable.
+    /// triggers the UI message and delayed destruction.
     /// </summary>
     void ApplyPowerUp(PlayerState playerState)
     {
@@ -95,11 +114,12 @@ public class PowerUp : MonoBehaviour
         if (grantMaxHP)
         {
             playerState.ApplyPermanentHPIncrease(HP_BONUS);
-            // --- CRITICAL: CALL SCALER ---
+            
+            // Crucial: When a NEW power-up is picked up, we must notify the scaler immediately
             if (scaler != null)
             {
                 scaler.OnHealthUpgradePickedUp();
-                Debug.Log("[PowerUp] HP Meter scale request sent.");
+                Debug.Log("[PowerUp] HP Meter scale request sent on NEW pickup.");
             }
             applied = true;
         }
@@ -108,16 +128,17 @@ public class PowerUp : MonoBehaviour
         if (grantMaxMagic)
         {
             playerState.ApplyPermanentMagicIncrease(MAGIC_BONUS);
-            // --- CRITICAL: CALL SCALER ---
+            
+            // Crucial: When a NEW power-up is picked up, we must notify the scaler immediately
             if (scaler != null)
             {
                 scaler.OnMagicUpgradePickedUp();
-                Debug.Log("[PowerUp] Magic Meter scale request sent.");
+                Debug.Log("[PowerUp] Magic Meter scale request sent on NEW pickup.");
             }
             applied = true;
         }
 
-        // Apply Sword Damage Multiplier (Note: Multipliers stack multiplicatively)
+        // Apply Sword Damage Multiplier
         if (grantDoubleSwordDamage)
         {
             playerState.ApplySwordDamageMultiplier(SWORD_MULTIPLIER);
@@ -133,29 +154,27 @@ public class PowerUp : MonoBehaviour
 
         if (applied)
         {
-            // 1. Restore HP and Magic to 100% of the new (or old) max value
+            // 1. Mark this specific pickup as collected for persistence immediately
+            PlayerPrefs.SetInt(pickupPersistenceKey, 1);
+            PlayerPrefs.Save();
+
+            // 2. Restore HP and Magic to 100% of the new max value
             playerState.RestoreHealthToMax();
             playerState.RestoreMagicToMax();
             Debug.Log("[PowerUp] Player HP and Magic restored to 100% max value.");
 
-            // 2. Mark this specific pickup as collected for persistence
-            PlayerPrefs.SetInt(pickupPersistenceKey, 1);
-            PlayerPrefs.Save();
-            
             Debug.Log($"[PowerUp] Collected '{gameObject.name}'. Bonuses applied and saved. Displaying message.");
 
-            // 3. Display the message, pause the game, and schedule this GameObject for destruction
+            // 3. Display the message (which handles destruction)
             if (UIManager.Instance != null)
             {
                 UIManager.Instance.DisplayActionMessage(pickupMessage, gameObject);
             }
             else
             {
-                Debug.LogWarning("[PowerUp] UIManager instance is missing. Destroying immediately without dialogue.");
+                Debug.LogWarning("[PowerUp] UIManager instance is missing. Destroying immediately.");
                 Destroy(gameObject);
             }
-
-            // IMPORTANT: We DO NOT call Destroy(gameObject) here. UIManager handles it on message dismissal.
         }
     }
 }

@@ -30,6 +30,7 @@ public class PlayerControls : MonoBehaviour
     private bool isGauntletMode = false;
 
     // References
+    // Now references the PlayerState component to check death status
     private PlayerState playerState;
 
     // Animator parameter names
@@ -57,7 +58,7 @@ public class PlayerControls : MonoBehaviour
         if (modelTransform != null)
         {
             animator = modelTransform.GetComponent<Animator>();
-            // NEW: Store the initial local position of the model
+            // Store the initial local position of the model
             originalModelLocalPosition = modelTransform.localPosition; 
         }
         else
@@ -68,6 +69,18 @@ public class PlayerControls : MonoBehaviour
 
     void Update()
     {
+        // --- DEATH CHECK: Disable all input and rotation when dying ---
+        if (playerState != null && playerState.IsDying())
+        {
+            // Optional: Force the animator to idle on death
+            if (animator != null)
+            {
+                animator.SetBool(IS_WALKING, false);
+                animator.SetBool(IS_BLOCKING, false);
+            }
+            return;
+        }
+
         // Update the ground plane's position dynamically to the current player height
         groundPlane.SetNormalAndPosition(Vector3.up, transform.position);
         
@@ -137,6 +150,13 @@ public class PlayerControls : MonoBehaviour
 
     void FixedUpdate()
     {
+        // --- DEATH CHECK: Stop all movement when dying ---
+        if (playerState != null && playerState.IsDying())
+        {
+            rb.linearVelocity = Vector3.zero;
+            return;
+        }
+
         // --- Move Rigidbody (Always relative to World Axes, as requested) ---
         
         Vector3 moveDirection = moveInput.normalized;
@@ -155,6 +175,12 @@ public class PlayerControls : MonoBehaviour
 
     void LateUpdate()
     {
+        // --- DEATH CHECK: Stop visual effects/rotation when dying ---
+        if (playerState != null && playerState.IsDying())
+        {
+            return;
+        }
+
         if (modelTransform == null) return;
 
         // 1. ROTATION LOGIC
@@ -163,9 +189,6 @@ public class PlayerControls : MonoBehaviour
         // --- GAUNTLET MODE (Aiming/Blocking) ---
         if (isGauntletMode)
         {
-            // When aiming, the ROOT object MUST be rotated so abilities fired from the root 
-            // (e.g., GauntletAbilities.cs) use the correct forward vector.
-            
             // Rotate the root object smoothly towards the mouse target
             transform.rotation = Quaternion.Slerp(
                 transform.rotation,
@@ -173,8 +196,7 @@ public class PlayerControls : MonoBehaviour
                 currentRotationSpeed * Time.deltaTime
             );
             
-            // The model (child) will inherit this rotation. We align the model's local rotation 
-            // to identity to ensure it follows the parent exactly and doesn't introduce double-rotation.
+            // Align model (child) local rotation to identity
             modelTransform.localRotation = Quaternion.Slerp(
                 modelTransform.localRotation,
                 Quaternion.identity,
@@ -184,7 +206,6 @@ public class PlayerControls : MonoBehaviour
         // --- NORMAL MODE (Walking/Idle) ---
         else
         {
-            // When not aiming, the root object remains fixed (rb.freezeRotation is true and we don't set transform.rotation).
             // Only the child model rotates for visual smoothness.
             modelTransform.rotation = Quaternion.Slerp(
                 modelTransform.rotation,
