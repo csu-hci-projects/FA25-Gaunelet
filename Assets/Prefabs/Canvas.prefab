@@ -254,6 +254,7 @@ GameObject:
   - component: {fileID: 2101084673183061311}
   - component: {fileID: 1024510864954145000}
   - component: {fileID: 5117344571266769396}
+  - component: {fileID: 3829060997318180148}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Canvas
@@ -381,6 +382,23 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StatMeterScaler
   hpSlider: {fileID: 5136785470795389347}
   magicSlider: {fileID: 5711551540549059932}
+--- !u!114 &3829060997318180148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4111809830672149168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3784fda9b62039340b787788be0b68df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MusicLoader
+  sceneMusicTracks:
+  - {fileID: 8300000, guid: 8409c52f6f1fcc44fa4cd810afb63798, type: 3}
+  - {fileID: 8300000, guid: 2bf1fc8fc0a900b48aae027c70d9aac4, type: 3}
+  - {fileID: 8300000, guid: 8fb5bc2b693d4da4aaf162e4c6dd8b27, type: 3}
+  - {fileID: 8300000, guid: 09a6890916a720d4f9ff9153c5eb643f, type: 3}
 --- !u!1 &4580199906675498289
 GameObject:
   m_ObjectHideFlags: 0
