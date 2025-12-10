@@ -1,12 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-/// <summary>
-/// Controls the behavior of a Fire Tile object's health.
-/// This script should be attached to a Collider child object of the main fire visual parent.
-/// It has health and ONLY takes damage if the player's currently active ability is Ice.
-/// </summary>
-public class Fire : MonoBehaviour, IDamageable // IMPLEMENT IDamageable
+// Controls the behavior of a Fire Tile object's health.
+// This script should be attached to a Collider child object of the main fire visual parent.
+// It has health and ONLY takes damage if the player's currently active ability is Ice.
+public class Fire : MonoBehaviour, IDamageable 
 {
     [Header("Fire Health")]
     [Tooltip("The initial health of the fire tile.")]
@@ -33,11 +31,8 @@ public class Fire : MonoBehaviour, IDamageable // IMPLEMENT IDamageable
         }
     }
 
-    /// <summary>
-    /// Reduces the fire tile's health and checks for destruction.
-    /// This method is called by ParticleDamage.cs via the IDamageable interface.
-    /// </summary>
-    /// <param name="damage">The amount of damage to take.</param>
+    // Reduces the fire tile's health and checks for destruction.
+    // This method is called by ParticleDamage.cs via the IDamageable interface.
     public void TakeDamage(float damage)
     {
         if (currentHealth <= 0) return; // Already destroyed
@@ -51,7 +46,6 @@ public class Fire : MonoBehaviour, IDamageable // IMPLEMENT IDamageable
             Debug.Log($"[Fire Tile] Physical damage of {damage} ignored. Requires Ice ability to affect.");
             return;
         }
-        // ------------------------------------
 
         // --- ELEMENTAL CHECK ---
         // Only take damage if the player is currently casting Ice.
@@ -74,9 +68,7 @@ public class Fire : MonoBehaviour, IDamageable // IMPLEMENT IDamageable
         }
     }
 
-    /// <summary>
-    /// Checks if the player's currently active ability is Ice using the GauntletAbilities reference.
-    /// </summary>
+    // Checks if the player's currently active ability is Ice using the GauntletAbilities reference.
     private bool IsPlayerCastingIce()
     {
         if (playerAbilities == null)
@@ -90,9 +82,7 @@ public class Fire : MonoBehaviour, IDamageable // IMPLEMENT IDamageable
         return playerAbilities.GetCurrentAbility() == AbilityType.Ice;
     }
 
-    /// <summary>
-    /// Implements the IDamageable interface. Returns true if health is above zero.
-    /// </summary>
+    // Implements the IDamageable interface. Returns true if health is above zero.
     public bool IsAlive()
     {
         return currentHealth > 0;

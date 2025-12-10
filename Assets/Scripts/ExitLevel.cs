@@ -1,10 +1,8 @@
 using UnityEngine;
 using UnityEngine.SceneManagement; // Required for loading scenes
 
-/// <summary>
-/// Attaching this script to a trigger volume will load the next specified scene
-/// when an object with the required tag (e.g., "Player") enters the volume.
-/// </summary>
+// Attaching this script to a trigger volume will load the next specified scene
+// when an object with the required tag (e.g., "Player") enters the volume.
 [RequireComponent(typeof(Collider))]
 public class ExitLevel : MonoBehaviour
 {
@@ -31,9 +29,7 @@ public class ExitLevel : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Called when another object enters the trigger volume.
-    /// </summary>
+    // Called when another object enters the trigger volume.
     private void OnTriggerEnter(Collider other)
     {
         // Check if the entering object has the required tag
@@ -43,9 +39,7 @@ public class ExitLevel : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Attempts to load the scene specified in the Inspector.
-    /// </summary>
+    // Attempts to load the scene specified in the Inspector.
     private void LoadNextLevel()
     {
         if (string.IsNullOrEmpty(nextSceneName))

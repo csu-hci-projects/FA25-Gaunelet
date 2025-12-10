@@ -1,13 +1,11 @@
 using UnityEngine;
-using TMPro; // Included for safety, though only needed if used locally.
+using TMPro;
 
-/// <summary>
-/// This script runs on the SIGN PREFAB right after it is spawned 
-/// (or it can be run by the spawning script).
-/// Its primary role is to find the global UI components (from UIManager) 
-/// and inject them into the local SignInfo script on the same GameObject, 
-/// preventing null reference errors.
-/// </summary>
+// This script runs on the SIGN PREFAB right after it is spawned 
+// (or it can be run by the spawning script).
+// Its primary role is to find the global UI components (from UIManager) 
+// and inject them into the local SignInfo script on the same GameObject, 
+// preventing null reference errors.
 public class SignInitializer : MonoBehaviour
 {
     private void Start()

@@ -2,10 +2,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement; 
 using System.Collections; // Required for IEnumerator
 
-/// <summary>
-/// Component to be attached to a collectible item that grants permanent,
-/// persistent stat bonuses to the player.
-/// </summary>
+// Component to be attached to a collectible item that grants permanent,
+// persistent stat bonuses to the player.
 [RequireComponent(typeof(Collider))] // Requires a Collider component
 public class PowerUp : MonoBehaviour
 {
@@ -102,10 +100,9 @@ public class PowerUp : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Applies the selected bonuses to the player's permanent stats via PlayerState and
-    /// triggers the UI message and delayed destruction.
-    /// </summary>
+    // Applies the selected bonuses to the player's permanent stats via PlayerState and
+    // triggers the UI message and delayed destruction.
+
     void ApplyPowerUp(PlayerState playerState)
     {
         bool applied = false;

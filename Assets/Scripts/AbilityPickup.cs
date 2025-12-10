@@ -24,8 +24,6 @@ public class AbilityPickup : MonoBehaviour
             if (gauntlet != null)
             {
                 // Check if the ability was already enabled to avoid re-triggering the message
-                // (Assuming GauntletAbilities has a public IsAbilityEnabled helper, 
-                // but since it's private, we rely on the EnableAbility method handling the state change.)
                 
                 // 1. Enable the ability on the GauntletAbilities script
                 gauntlet.EnableAbility(abilityToEnable);

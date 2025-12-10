@@ -1,9 +1,7 @@
 using UnityEngine;
 
-/// <summary>
-/// Controls the periodic up-and-down (bobbing) movement of a game object
-/// along the Y-axis, simulating an item moving in and out of the ground plane.
-/// </summary>
+// Controls the periodic up-and-down (bobbing) movement of a game object
+// along the Y-axis, simulating an item moving in and out of the ground plane.
 public class ItemMove : MonoBehaviour
 {
     [Header("Bobbing Configuration")]
@@ -32,7 +30,6 @@ public class ItemMove : MonoBehaviour
     void Update()
     {
         // 1. Calculate the periodic vertical movement (Bobbing)
-        // Time.time gives the running time of the game.
         // Mathf.Sin(time) oscillates smoothly between -1 and 1.
         // Multiplying by 'amplitude' scales the movement range.
         float bobOffset = Mathf.Sin(Time.time * frequency) * amplitude;

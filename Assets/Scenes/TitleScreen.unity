@@ -927,7 +927,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 49}
+  m_AnchoredPosition: {x: 0, y: 180}
   m_SizeDelta: {x: 326, y: 159.3}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1481074955
@@ -956,7 +956,10 @@ MonoBehaviour:
     While in Gauntlet Mode, press and hold left mouse button to use the currently
     selected Gauntlet Spell\n\n4. Use the E key to cycle through your unlocked Gauntlet
     Spells\n\n5. Space bar is used as the action button, press it near signs and
-    objects to read or interact with them"
+    objects to read or interact with them\n\n6. Use Escape key to exit to title screen
+    at any time\n\nNOTE: The game can be challenging, exploration is encouraged.
+    and combat can take some practice. Be sure to read signs, the tips and tricks
+    they give are crucial for advancing in the levels!"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

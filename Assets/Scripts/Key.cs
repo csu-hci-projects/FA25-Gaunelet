@@ -1,10 +1,8 @@
 using UnityEngine;
 
-/// <summary>
-/// Handles the key collection logic. When the player (tagged "Player")
-/// enters the trigger volume, it destroys a specified target door, 
-/// displays a success message via the UIManager, and then destroys itself.
-/// </summary>
+// Handles the key collection logic. When the player (tagged "Player")
+// enters the trigger volume, it destroys a specified target door, 
+// displays a success message via the UIManager, and then destroys itself.
 public class Key : MonoBehaviour
 {
     [Header("Door Target")]
@@ -39,10 +37,8 @@ public class Key : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Called when another collider enters this key's trigger volume.
-    /// </summary>
-    /// <param name="other">The Collider that entered the trigger.</param>
+    // Called when another collider enters this key's trigger volume.
+    // <param name="other">The Collider that entered the trigger.</param>
     void OnTriggerEnter(Collider other)
     {
         // 1. Check if the object entering the trigger is the Player

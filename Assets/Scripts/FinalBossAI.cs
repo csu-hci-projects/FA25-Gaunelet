@@ -1,15 +1,13 @@
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.SceneManagement; // REQUIRED for loading scenes
-using System.Collections; // REQUIRED for Coroutines
+using UnityEngine.SceneManagement;
+using System.Collections; 
 
-/// <summary>
-/// AI component for the final boss, which remains idle until the player enters its
-/// engagement range, then attacks with devastating, block-dependent damage.
-/// </summary>
+// AI component for the final boss, which remains idle until the player enters its
+// engagement range, then attacks with devastating, block-dependent damage.
 public class FinalBossAI : MonoBehaviour, IDamageable
 {
-    // --- Combat Damage Constants ---
+    // Combat Damage Constants
     private const float NO_BLOCK_DAMAGE = 150f; // Instantly kills player if not blocking
     private const float BLOCK_DAMAGE = 25f;    // Damage if player is blocking
 
@@ -77,9 +75,7 @@ public class FinalBossAI : MonoBehaviour, IDamageable
 
         agent.updateRotation = false; // We handle rotation manually
         
-        // --- HP Initialization ---
         currentHP = maxHP; // Now uses the serialized maxHP
-        // -------------------------
 
         // Ensure boss starts idle and stopped
         agent.isStopped = true;
@@ -111,9 +107,7 @@ public class FinalBossAI : MonoBehaviour, IDamageable
         UpdateAnimation();
     }
 
-    /// <summary>
-    /// Boss stands still and waits.
-    /// </summary>
+    // Boss stands still and waits.
     void StandIdle()
     {
         agent.isStopped = true;
@@ -141,10 +135,8 @@ public class FinalBossAI : MonoBehaviour, IDamageable
         }
     }
     
-    /// <summary>
-    /// Calculates and applies damage to the player based on whether they are blocking.
-    /// Called by Invoke to sync with the attack animation.
-    /// </summary>
+    // Calculates and applies damage to the player based on whether they are blocking.
+    // Called by Invoke to sync with the attack animation.
     void DealDamageToPlayer()
     {
         if (playerState != null && playerState.IsAlive())
@@ -208,7 +200,7 @@ public class FinalBossAI : MonoBehaviour, IDamageable
         Gizmos.DrawWireSphere(transform.position, chaseRange);
     }
 
-    // --- IDamageable Implementation ---
+    // IDamageable Implementation
 
     public void TakeDamage(float damage)
     {
@@ -252,11 +244,9 @@ public class FinalBossAI : MonoBehaviour, IDamageable
         Destroy(gameObject, deathAnimationDuration);
     }
     
-    /// <summary>
-    /// Displays the victory message and schedules the title scene load.
-    /// CRITICAL FIX: We start a Coroutine on the UIManager to handle the delay, 
-    /// because this FinalBoss object is about to be destroyed and cannot run Invokes.
-    /// </summary>
+
+    // Displays the victory message and schedules the title scene load. 
+    // because this FinalBoss object is about to be destroyed and cannot run Invokes.
     private void OnDestroy()
     {
         // Only show the message if the boss died naturally.
@@ -277,9 +267,8 @@ public class FinalBossAI : MonoBehaviour, IDamageable
         }
     }
 
-    /// <summary>
-    /// Coroutine that waits for the specified delay and then loads the scene.
-    /// </summary>
+
+    // Coroutine that waits for the specified delay and then loads the scene.
     private IEnumerator LoadSceneAfterDelay(int sceneIndex, float delay)
     {
         yield return new WaitForSeconds(delay);

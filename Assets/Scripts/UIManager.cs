@@ -31,6 +31,9 @@ public class UIManager : MonoBehaviour
     private bool isMessageVisible = false;
     private GameObject objectToDestroyOnDismiss; 
     
+    // NEW FIX: Flag to prevent immediate dismissal on the same frame the game pauses.
+    private bool isDismissalAllowed = false; 
+    
     // Cache the abilities script to read the current spell
     private GauntletAbilities playerAbilities;
     // Track the last seen ability to prevent updating text every single frame
@@ -99,7 +102,6 @@ public class UIManager : MonoBehaviour
 
 
         // 2. --- INITIALIZATION FOR LOGGING ONLY ---
-        // We set the MAX VALUE in UpdateHealthBar now, so only use current values for initial log and setup.
         float maxHP = playerState.GetMaxHP();
         float currentHP = playerState.GetCurrentHP();
         
@@ -130,10 +132,8 @@ public class UIManager : MonoBehaviour
         Debug.Log("UI Manager initialized: HP and Magic sliders set to starting values.");
     }
     
-    /// <summary>
-    /// Delays the StatMeterScaler sync by one frame to ensure the visual resize happens 
-    /// AFTER the UI layout system has completed its initial frame update, resolving the timing conflict.
-    /// </summary>
+    // Delays the StatMeterScaler sync by one frame to ensure the visual resize happens 
+    // AFTER the UI layout system has completed its initial frame update, resolving the timing conflict.
     private IEnumerator SyncMeterVisualsDelayed(float maxHP, float maxMagic)
     {
         // Wait one frame. This is the most reliable way to ensure the UI is stable.
@@ -159,7 +159,17 @@ public class UIManager : MonoBehaviour
         }
     }
 
-
+    // Allows external systems (like MessageLoader) to forcibly reset the internal
+    // message visibility status, preventing conflicts when multiple systems use the same panel.
+    public void ResetMessageStatus()
+    {
+        isMessageVisible = false;
+        objectToDestroyOnDismiss = null; // Clear destruction target just in case
+        isDismissalAllowed = false; // Reset input safety flag
+        Debug.Log("[UIManager] External message status reset.");
+        // Note: We do NOT resume time here, as MessageLoader handles the unpause.
+    }
+    
     void Update()
     {
         // Continuously update the UI based on current player stats
@@ -169,17 +179,25 @@ public class UIManager : MonoBehaviour
         // --- Update Spell Text ---
         UpdateActiveSpellUI();
         
-        // Check for message dismissal: Space key (Only affects the PAUSING messages)
-        if (isMessageVisible && Time.timeScale == 0f && Input.GetKeyDown(KeyCode.Space))
+        // --- Dismissal Logic for Interactive Messages ---
+        // We only check for dismissal if the message is visible AND the game is paused AND
+        // the one-frame safety delay has passed.
+        if (isMessageVisible && Time.timeScale == 0f)
         {
-            HidePickupMessage();
+            // The very first frame Time.timeScale is 0, we set the flag.
+            if (!isDismissalAllowed)
+            {
+                isDismissalAllowed = true;
+            }
+            // The second frame (and later), we check for dismissal.
+            else if (Input.GetKeyDown(KeyCode.Space))
+            {
+                HidePickupMessage();
+            }
         }
     }
 
-    /// <summary>
-    /// **FIX:** Enforces the correct maxValue every frame before setting the current value.
-    /// This prevents any external script from resetting maxValue back to the Inspector default (100).
-    /// </summary>
+    // This prevents any external script from resetting maxValue back to the Inspector default (100).
     public void UpdateHealthBar(float currentHP)
     {
         // 1. Force the maxValue to the true maximum from PlayerState every frame.
@@ -189,10 +207,7 @@ public class UIManager : MonoBehaviour
         healthSlider.value = currentHP;
     }
 
-    /// <summary>
-    /// **FIX:** Enforces the correct maxValue every frame before setting the current value.
-    /// This prevents any external script from resetting maxValue back to the Inspector default (100).
-    /// </summary>
+    // This prevents any external script from resetting maxValue back to the Inspector default (100).
     public void UpdateMagicBar(float currentMagic)
     {
         // 1. Force the maxValue to the true maximum from PlayerState every frame.
@@ -202,9 +217,7 @@ public class UIManager : MonoBehaviour
         magicSlider.value = currentMagic;
     }
     
-    /// <summary>
-    /// Checks the player's current ability and updates the UI text if it has changed.
-    /// </summary>
+    // Checks the player's current ability and updates the UI text if it has changed.
     private void UpdateActiveSpellUI(bool forceUpdate = false)
     {
         if (playerAbilities == null || activeSpellText == null) return;
@@ -231,16 +244,14 @@ public class UIManager : MonoBehaviour
         }
     }
     
-    /// <summary>
-    /// Displays a message on the UI for a short duration without pausing the game.
-    /// Used for simple notifications like when a barrier is destroyed.
-    /// </summary>
+    // Displays a message on the UI for a short duration without pausing the game.
+    // Used for simple notifications like when a barrier is destroyed.
     public void ShowNotificationMessage(string message)
     {
         if (messagePanel == null || messageText == null) return;
         
         // Ensure we stop any previous notification coroutine to prevent overlap
-        StopCoroutine(nameof(HideMessageAfterDelay));
+        StopCoroutine(nameof(HideMessageAfterDelay)); 
         
         messageText.text = message; 
         messagePanel.SetActive(true);
@@ -252,10 +263,8 @@ public class UIManager : MonoBehaviour
         Debug.Log($"[UI] Displaying notification: {message}. Game running.");
     }
     
-    /// <summary>
-    /// Coroutine to wait for a delay and then hide the message panel.
-    /// Uses WaitForSecondsRealtime so it functions correctly even if Time.timeScale is modified elsewhere.
-    /// </summary>
+    // Coroutine to wait for a delay and then hide the message panel.
+    // Uses WaitForSecondsRealtime so it functions correctly even if Time.timeScale is modified elsewhere.
     private IEnumerator HideMessageAfterDelay(float delay)
     {
         yield return new WaitForSecondsRealtime(delay);
@@ -269,14 +278,16 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Displays a message on the UI, pauses the game, and schedules an object for destruction 
-    /// upon message dismissal. Called by triggers like DestroyOnTrigger.
-    /// </summary>
+    // Displays a message on the UI, pauses the game, and schedules an object for destruction 
+    // upon message dismissal. Called by triggers like DestroyOnTrigger.
     public void DisplayActionMessage(string message, GameObject targetToDestroy)
     {
-        if (isMessageVisible || messagePanel == null || messageText == null) return;
-        
+        if (messagePanel == null || messageText == null)
+        {
+             Debug.LogError("[UIManager] Pickup Message UI references (Panel or Text) are missing in UIManager! Cannot display message.");
+             return;
+        }
+
         // Stop any running notification coroutine, as this is an interactive message
         StopCoroutine(nameof(HideMessageAfterDelay)); 
         
@@ -285,8 +296,11 @@ public class UIManager : MonoBehaviour
 
         // Use .text for TextMeshProUGUI
         messageText.text = message; 
+        
+        // CRITICAL STEP: Ensure the panel is visible before pausing
         messagePanel.SetActive(true);
-        isMessageVisible = true;
+        isMessageVisible = true; // Mark as visible immediately
+        isDismissalAllowed = false; // RESET the safety flag
 
         // PAUSE THE GAME
         Time.timeScale = 0f; 
@@ -294,19 +308,15 @@ public class UIManager : MonoBehaviour
         Debug.Log($"[UI] Displaying action message: {message}. Game Paused. Target for delayed destruction: {targetToDestroy?.name ?? "None"}.");
     }
     
-    /// <summary>
-    /// Displays a message on the UI. Called by AbilityPickup.cs (or old systems).
-    /// This uses the Action Message system, pausing the game until dismissed by Space bar.
-    /// </summary>
+    // Displays a message on the UI. Called by AbilityPickup.cs (or old systems).
+    // This uses the Action Message system, pausing the game until dismissed by Space bar.
     public void DisplayPickupMessage(string message)
     {
         // Simply call the action message variant with a null destruction target (for pickups)
         DisplayActionMessage(message, null);
     }
 
-    /// <summary>
-    /// Hides the message, performs delayed destruction if scheduled, and resumes game flow.
-    /// </summary>
+    // Hides the message, performs delayed destruction if scheduled, and resumes game flow.
     public void HidePickupMessage()
     {
         if (!isMessageVisible || messagePanel == null) return;
@@ -320,8 +330,10 @@ public class UIManager : MonoBehaviour
         }
         // -------------------------
 
+        // CRITICAL STEP: Hide the panel first
         messagePanel.SetActive(false);
-        isMessageVisible = false;
+        isMessageVisible = false; // Reset the flag
+        isDismissalAllowed = false; // Reset the safety flag
 
         // RESUME THE GAME
         Time.timeScale = 1f; 

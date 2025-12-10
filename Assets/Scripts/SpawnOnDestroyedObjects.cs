@@ -15,7 +15,6 @@ public class SpawnOnDestroyedObjects : MonoBehaviour
 
     void Start()
     {
-        // SAFETY CHECK: If the list is empty at the very start, 
         // we assume something is wrong (or unassigned) and prevent the item 
         // from spawning immediately.
         if (targetsToDestroy == null || targetsToDestroy.Count == 0)

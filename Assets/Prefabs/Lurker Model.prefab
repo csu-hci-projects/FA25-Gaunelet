@@ -185,17 +185,33 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1229640397334025898, guid: 1936ad3cbc0e1ae448060119a3c8ed0b, type: 3}
+      propertyPath: chaseRange
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1229640397334025898, guid: 1936ad3cbc0e1ae448060119a3c8ed0b, type: 3}
+      propertyPath: damageRange
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1229640397334025898, guid: 1936ad3cbc0e1ae448060119a3c8ed0b, type: 3}
+      propertyPath: patrolSpeed
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1229640397334025898, guid: 1936ad3cbc0e1ae448060119a3c8ed0b, type: 3}
+      propertyPath: proximityDamage
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 1229640397334025898, guid: 1936ad3cbc0e1ae448060119a3c8ed0b, type: 3}
       propertyPath: 'patrolPoints.Array.data[0]'
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 4046294026649986968}
     - target: {fileID: 1229640397334025898, guid: 1936ad3cbc0e1ae448060119a3c8ed0b, type: 3}
       propertyPath: 'patrolPoints.Array.data[1]'
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 7487196214538439434}
     - target: {fileID: 1229640397334025898, guid: 1936ad3cbc0e1ae448060119a3c8ed0b, type: 3}
       propertyPath: 'patrolPoints.Array.data[2]'
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 6208405358713767721}
     - target: {fileID: 8731666914364602335, guid: 1936ad3cbc0e1ae448060119a3c8ed0b, type: 3}
       propertyPath: m_Name
       value: Lurker

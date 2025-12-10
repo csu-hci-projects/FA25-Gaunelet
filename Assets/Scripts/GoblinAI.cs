@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-// GoblinAI now implements the IDamageable interface
 public class GoblinAI : MonoBehaviour, IDamageable
 {
     [Header("Patrol Settings")]

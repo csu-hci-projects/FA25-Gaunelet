@@ -174,10 +174,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6b7f06cd233f194abc2178a21b0231d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack
-  attackDamage: 15
+  attackDamage: 18
   attackRange: 2.5
-  attackDelay: 0.3
-  attackCooldown: 0.8
+  attackDelay: 0.25
+  attackCooldown: 0.65
   enemyLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -198,7 +198,9 @@ MonoBehaviour:
   currentHP: 100
   baseMaxMagic: 100
   currentMagic: 100
-  baseSwordDamage: 15
+  baseSwordDamage: 18
+  reloadSceneOnDeath: 1
+  deathReloadDelay: 2
   magicRegenRate: 0.45
   blockDamageReduction: 0.3
 --- !u!114 &7335530344383147366

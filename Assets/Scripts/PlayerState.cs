@@ -63,9 +63,7 @@ public class PlayerState : MonoBehaviour, IDamageable
         RegenerateMagic();
     }
 
-    /// <summary>
-    /// Loads the permanent power-up bonuses from PlayerPrefs.
-    /// </summary>
+    // Loads the permanent power-up bonuses from PlayerPrefs.
     void LoadPowerUps()
     {
         // Default to 0 for bonuses, 1 for multipliers if no saved value exists.
@@ -143,9 +141,7 @@ public class PlayerState : MonoBehaviour, IDamageable
         }
     }
 
-    /// <summary>
-    /// Coroutine to wait for the specified delay and then reload the scene.
-    /// </summary>
+    // Coroutine to wait for the specified delay and then reload the scene.
     private IEnumerator ReloadSceneAfterDelay()
     {
         Debug.Log($"[PlayerState: Death] Reloading scene in {deathReloadDelay:F2} seconds...");

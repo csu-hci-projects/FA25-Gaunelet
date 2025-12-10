@@ -2,10 +2,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI; // Required for accessing Slider components
 
-/// <summary>
-/// Handles scaling the UI Sliders for Health and Magic by 50% when an upgrade is picked up.
-/// Also updates the Slider's logic (maxValue) to match the new stats immediately.
-/// </summary>
+// Handles scaling the UI Sliders for Health and Magic by 50% when an upgrade is picked up.
+// Also updates the Slider's logic (maxValue) to match the new stats immediately.
 public class StatMeterScaler : MonoBehaviour
 {
     // --- Persistence Keys ---
@@ -48,9 +46,7 @@ public class StatMeterScaler : MonoBehaviour
     
     // --- Public Methods for Upgrade Pickups ---
 
-    /// <summary>
-    /// Call this method when the player picks up a permanent Health upgrade.
-    /// </summary>
+    // Call this method when the player picks up a permanent Health upgrade.
     public void OnHealthUpgradePickedUp()
     {
         if (isHpScaled || hpSlider == null) return;
@@ -68,9 +64,7 @@ public class StatMeterScaler : MonoBehaviour
         Debug.Log("[StatMeterScaler] HP meter scaled and maxValue updated.");
     }
 
-    /// <summary>
-    /// Call this method when the player picks up a permanent Magic upgrade.
-    /// </summary>
+    // Call this method when the player picks up a permanent Magic upgrade.
     public void OnMagicUpgradePickedUp()
     {
         if (isMagicScaled || magicSlider == null) return;
@@ -89,10 +83,8 @@ public class StatMeterScaler : MonoBehaviour
 
     // --- Private Helper Method ---
 
-    /// <summary>
-    /// Applies the scale factor to the width of the Slider root.
-    /// Uses position compensation to ensure it grows ONLY to the right.
-    /// </summary>
+    // Applies the scale factor to the width of the Slider root.
+    // Uses position compensation to ensure it grows ONLY to the right.
     private void ApplyScaleVisuals(Slider slider, float factor)
     {
         if (slider == null) return;

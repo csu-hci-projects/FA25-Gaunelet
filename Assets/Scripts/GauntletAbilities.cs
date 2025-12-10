@@ -17,8 +17,6 @@ public class GauntletAbilities : MonoBehaviour
     public float lightDrainRate = 5f;
     public float invincibleDrainRate = 15f; 
 
-    // NOTE: These fields now represent the CURRENT state, which is determined 
-    // by scene defaults AND persistence loading in Start().
     [Header("Ability Availability Toggles")]
     // Inspector values now only serve as a generic fallback for unknown scenes.
     public bool isFireEnabled = true; 
@@ -105,13 +103,11 @@ public class GauntletAbilities : MonoBehaviour
         InitializeAbilityStates(); 
     }
 
-    /// <summary>
-    /// Handles initial setup by strictly enforcing the scene's minimum required abilities.
-    /// New scene logic:
-    /// Scene 1 (Woodland): None
-    /// Scene 2 (Dungeon): Fire, Ice
-    /// Scene 3 (Labyrinth): Fire, Ice, Invincible
-    /// </summary>
+    // Handles initial setup by strictly enforcing the scene's minimum required abilities.
+    // New scene logic:
+    // Scene 1 (Woodland): None
+    // Scene 2 (Dungeon): Fire, Ice
+    // Scene 3 (Labyrinth): Fire, Ice, Invincible
     private void InitializeAbilityStates()
     {
         int sceneIndex = SceneManager.GetActiveScene().buildIndex;
@@ -349,9 +345,7 @@ public class GauntletAbilities : MonoBehaviour
 
     // --- Core Ability Methods ---
     
-    /// <summary>
-    /// Aggressively stops and clears all particles. Used for cycling or cleanup.
-    /// </summary>
+    // Aggressively stops and clears all particles. Used for cycling or cleanup.
     void ClearAllEmittersVFX()
     {
         fireEmitter?.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -440,7 +434,6 @@ public class GauntletAbilities : MonoBehaviour
 
         isCasting = false;
         
-        // --- MODIFIED LOGIC: Allow all channeled spells to persist until their lifespan is met. ---
         ParticleSystem activeEmitter = currentAbility switch
         {
             AbilityType.Fire => fireEmitter,
@@ -451,11 +444,10 @@ public class GauntletAbilities : MonoBehaviour
 
         if (activeEmitter != null)
         {
-            // By using StopEmitting, we stop generating new particles, but allow existing ones
+            // By using StopEmitting, stop generating new particles, but allow existing ones
             // to continue until their individual lifespan expires (natural fade-out).
             activeEmitter.Stop(true, ParticleSystemStopBehavior.StopEmitting);
         }
-        // --- END MODIFICATION ---
 
         Debug.Log($"[Gauntlet] {currentAbility} Channel STOP!");
     }
@@ -528,17 +520,13 @@ public class GauntletAbilities : MonoBehaviour
     
     // --- Helper Logic Methods ---
 
-    /// <summary>
-    /// Public accessor for other scripts to check the currently selected ability type.
-    /// </summary>
+    // Public accessor for other scripts to check the currently selected ability type.
     public AbilityType GetCurrentAbility()
     {
         return currentAbility;
     }
 
-    /// <summary>
-    /// Checks the current in-memory state of an ability (determined by Scene Default OR Persistence).
-    /// </summary>
+    // Checks the current in-memory state of an ability (determined by Scene Default OR Persistence).
     public bool IsAbilityEnabled(AbilityType ability)
     {
         return ability switch
@@ -632,12 +620,10 @@ public class GauntletAbilities : MonoBehaviour
         Debug.LogWarning("[Gauntlet] No available ability to switch to! Reverting to None.");
     }
     
-    /// <summary>
-    /// Handles applying the ability's material to the player model when the gauntlet is active.
-    /// This function now ONLY handles restoring the original materials (AbilityType.None or Fire/Ice/Light 
-    /// when Invincible is not active) or is a safety check. The full Invincible override is handled 
-    /// in StartInvincibility().
-    /// </summary>
+    // Handles applying the ability's material to the player model when the gauntlet is active.
+    // This function now ONLY handles restoring the original materials (AbilityType.None or Fire/Ice/Light 
+    // when Invincible is not active) or is a safety check. The full Invincible override is handled 
+    // in StartInvincibility().
     void ApplySpellVisuals(AbilityType ability, bool force = false)
     {
         // If we are not actively holding RMB, only proceed if forced (e.g., in Start() or Cycle())

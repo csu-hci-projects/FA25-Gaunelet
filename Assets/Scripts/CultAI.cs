@@ -131,7 +131,7 @@ public class CultAI : MonoBehaviour, IDamageable
         UpdateAnimation();
     }
 
-    // --- Movement Logic ---
+    // Movement Logic
 
     void Wander()
     {
@@ -160,7 +160,7 @@ public class CultAI : MonoBehaviour, IDamageable
         }
     }
 
-    // --- Combat Logic ---
+    // Combat Logic
     
     // Rotates the enemy to face the player using the fast combat speed.
     void FacePlayer()
@@ -282,7 +282,7 @@ public class CultAI : MonoBehaviour, IDamageable
         }
     }
 
-    // --- Animator Control Methods ---
+    // Animator Control Methods
 
     void FreezeAnimator()
     {
@@ -306,7 +306,7 @@ public class CultAI : MonoBehaviour, IDamageable
         Debug.Log("[Cultist] Animator Unfrozen (Ready to move/attack).");
     }
 
-    // --- IDamageable Implementation ---
+    // IDamageable Implementation
 
     public void TakeDamage(float damage)
     {

@@ -1,10 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-/// <summary>
-/// This script enables the MeshRenderer components of a list of target GameObjects
-/// when the player is inside the trigger volume and presses the specified key.
-/// </summary>
+// This script enables the MeshRenderer components of a list of target GameObjects
+// when the player is inside the trigger volume and presses the specified key.
 [RequireComponent(typeof(BoxCollider))] // Requires a Collider for the trigger area
 [RequireComponent(typeof(Rigidbody))]    // Requires a Rigidbody to detect the player
 public class RevealOnKeyPress : MonoBehaviour
@@ -33,9 +31,7 @@ public class RevealOnKeyPress : MonoBehaviour
         SetTargetsVisibility(false);
     }
 
-    /// <summary>
-    /// Called when another collider enters the trigger.
-    /// </summary>
+    // Called when another collider enters the trigger.
     private void OnTriggerEnter(Collider other)
     {
         // Check if the entering object is the player (based on tag)
@@ -46,9 +42,7 @@ public class RevealOnKeyPress : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Called every frame while another collider is inside the trigger.
-    /// </summary>
+    // Called every frame while another collider is inside the trigger.
     private void OnTriggerStay(Collider other)
     {
         if (hasBeenActivated) return;
@@ -60,9 +54,7 @@ public class RevealOnKeyPress : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Called when another collider exits the trigger.
-    /// </summary>
+    // Called when another collider exits the trigger.
     private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player"))
@@ -72,9 +64,7 @@ public class RevealOnKeyPress : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Activates the renderers on all target objects.
-    /// </summary>
+    // Activates the renderers on all target objects.
     private void ActivateReveal()
     {
         if (hasBeenActivated) return;
@@ -87,11 +77,8 @@ public class RevealOnKeyPress : MonoBehaviour
         // Destroy(gameObject);
     }
 
-    /// <summary>
-    /// Sets the enabled state of all Renderer components (MeshRenderer, SkinnedMeshRenderer, etc.) 
-    /// on the target object and all its children.
-    /// </summary>
-    /// <param name="isVisible">True to show, False to hide.</param>
+    // Sets the enabled state of all Renderer components (MeshRenderer, SkinnedMeshRenderer, etc.) 
+    // on the target object and all its children.
     private void SetTargetsVisibility(bool isVisible)
     {
         foreach (GameObject target in objectsToReveal)

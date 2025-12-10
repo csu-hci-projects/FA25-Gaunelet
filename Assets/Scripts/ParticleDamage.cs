@@ -1,10 +1,8 @@
 using UnityEngine;
 
-/// <summary>
-/// This script must be attached to the Particle System emitter (e.g., IceEmitter).
-/// It listens for particle collision events and applies damage to any hit object
-/// that implements the IDamageable interface.
-/// </summary>
+// This script must be attached to the Particle System emitter (e.g., IceEmitter).
+// It listens for particle collision events and applies damage to any hit object
+// that implements the IDamageable interface.
 public class ParticleDamage : MonoBehaviour
 {
     // The amount of damage a single particle hit applies.
@@ -30,12 +28,9 @@ public class ParticleDamage : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// This is a special Unity function called when a particle from this system hits a collider.
-    /// NOTE: For this to be called, the Particle System's 'Collision' module must be enabled,
-    /// and 'Send Collision Messages' must be checked.
-    /// </summary>
-    /// <param name="other">The GameObject whose collider the particle hit.</param>
+    // This is a special Unity function called when a particle from this system hits a collider.
+    // NOTE: For this to be called, the Particle System's 'Collision' module must be enabled,
+    // and 'Send Collision Messages' must be checked.
     void OnParticleCollision(GameObject other)
     {
         // 1. CRITICAL FIX: Ignore collisions with the player (the caster)

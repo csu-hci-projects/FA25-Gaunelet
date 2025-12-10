@@ -1,9 +1,7 @@
 using UnityEngine;
 
-/// <summary>
-/// A reusable trigger volume that sends a target GameObject and a message to the UIManager 
-/// for destruction and display upon key press. The actual destruction is delayed until the message is dismissed.
-/// </summary>
+//A reusable trigger volume that sends a target GameObject and a message to the UIManager 
+//for destruction and display upon key press. The actual destruction is delayed until the message is dismissed.
 public class DestroyOnTrigger : MonoBehaviour
 {
     [Header("Action Configuration")]
@@ -23,7 +21,7 @@ public class DestroyOnTrigger : MonoBehaviour
 
     private bool playerIsInRange = false;
 
-    // --- Collider Detection ---
+    // Collider Detection
 
     // Called when another collider enters the trigger collider
     private void OnTriggerEnter(Collider other)
@@ -45,7 +43,7 @@ public class DestroyOnTrigger : MonoBehaviour
         }
     }
 
-    // --- Input and Action ---
+    // Input and Action
 
     void Update()
     {
@@ -60,7 +58,6 @@ public class DestroyOnTrigger : MonoBehaviour
     {
         if (targetToDestroy != null)
         {
-            // CRITICAL CHANGE: We no longer destroy the target here. We pass it to the UIManager.
             
             if (UIManager.Instance != null)
             {

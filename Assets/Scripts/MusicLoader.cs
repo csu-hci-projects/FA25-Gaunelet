@@ -1,22 +1,20 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Listens for scene changes and loads the corresponding music track
-/// based on the scene's build index.
-/// 
-/// SCENE INDEX MAPPING (You must verify these indices in your Build Settings):
-/// 1: Woodland
-/// 2: Dungeon
-/// 3: Labyrinth
-/// </summary>
+// Listens for scene changes and loads the corresponding music track
+// based on the scene's build index.
+// 
+// SCENE INDEX MAPPING
+// 1: Woodland
+// 2: Dungeon
+// 3: Labyrinth
+// </summary>
 public class MusicLoader : MonoBehaviour
 {
     [Header("Music Tracks (Assign by Scene Index)")]
     [Tooltip("Index 0 is often the Title/Menu screen. Assign clips starting from the index 1 (Woodland).")]
     public AudioClip[] sceneMusicTracks;
 
-    // --- You will need to manually ensure the music manager exists once ---
     private MusicManager musicManagerInstance;
 
     void Start()
@@ -46,9 +44,7 @@ public class MusicLoader : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    /// <summary>
-    /// Event handler called every time a new scene finishes loading.
-    /// </summary>
+    // Event handler called every time a new scene finishes loading.
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // Only load music if the scene was loaded in Single mode (standard level change)
@@ -58,18 +54,14 @@ public class MusicLoader : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Checks the current scene's index and attempts to play the corresponding track.
-    /// </summary>
+    // Checks the current scene's index and attempts to play the corresponding track.
     private void LoadMusicForCurrentScene()
     {
         int index = SceneManager.GetActiveScene().buildIndex;
         LoadMusicForSceneIndex(index);
     }
     
-    /// <summary>
-    /// Plays the music clip corresponding to the given scene index.
-    /// </summary>
+    // Plays the music clip corresponding to the given scene index.
     private void LoadMusicForSceneIndex(int sceneIndex)
     {
         // musicManagerInstance should now always be available due to the fix in Start()

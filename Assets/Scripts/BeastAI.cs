@@ -1,9 +1,15 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-// BeastAI now implements the IDamageable interface
+
 public class BeastAI : MonoBehaviour, IDamageable 
 {
+    // Animation Parameter Constants
+    private const string AnimParam_Speed = "Speed";
+    private const string AnimParam_IsWalking = "IsWalking"; 
+    private const string AnimParam_Attack = "Attack";
+    private const string AnimParam_Death = "Death";
+    
     [Header("Wander Settings")]
     [SerializeField] private float wanderRadius = 15f; 
     [SerializeField] private float wanderSpeed = 3.5f;
@@ -15,16 +21,19 @@ public class BeastAI : MonoBehaviour, IDamageable
 
     [Header("Combat Settings (Increased Aggression/Power)")]
     [SerializeField] private Transform player;
-    [SerializeField] private float chaseRange = 15f;    
-    [SerializeField] private float attackRange = 1.8f;  
+    [Tooltip("The initial range at which the beast detects the player and initiates chase.")]
+    [SerializeField] private float chaseRange = 15f;    
+    [Tooltip("The maximum distance the beast will chase the player once aggro is initiated.")]
+    [SerializeField] private float relentlessChaseRange = 40f; // New High Range for Chase Lock
+    [SerializeField] private float attackRange = 1.8f;  
     [SerializeField] private float attackCooldown = 1.5f; 
-    [SerializeField] private float attackDamage = 35f;  
+    [SerializeField] private float attackDamage = 35f;  
     [SerializeField] private float attackDelay = 0.5f; 
-    [SerializeField] private float chaseSpeed = 6.5f;   
+    [SerializeField] private float chaseSpeed = 6.5f;   
 
     [Header("Beast Stats")]
-    [SerializeField] private float maxHP = 120f;        
-    [SerializeField] private float currentHP = 120f;    
+    [SerializeField] private float maxHP = 120f;        
+    [SerializeField] private float currentHP = 120f;    
 
     [Header("Death Settings")]
     [SerializeField] private float deathDestroyDelay = 3f; 
@@ -35,6 +44,7 @@ public class BeastAI : MonoBehaviour, IDamageable
 
     private float attackTimer = 0f;
     private bool isDead = false;
+    private bool isAggro = false; // State flag: true means the beast is actively pursuing the player
 
     void Start()
     {
@@ -43,12 +53,18 @@ public class BeastAI : MonoBehaviour, IDamageable
 
         if (agent == null)
         {
-            Debug.LogError("NavMeshAgent component missing on " + gameObject.name);
+            Debug.LogError("NavMeshAgent component missing on " + gameObject.name + ". Cannot move.");
             return;
         }
 
+        if (animator == null)
+        {
+             Debug.LogWarning("Animator component missing on " + gameObject.name + ". Animations disabled.");
+        }
+
+
         // Set the spawn point to the beast's starting position
-        spawnPoint = transform.position;
+        spawnPoint = transform.position; 
 
         // Get PlayerState component from player
         if (player != null)
@@ -77,19 +93,38 @@ public class BeastAI : MonoBehaviour, IDamageable
 
         attackTimer += Time.deltaTime;
 
-        // Use Infinity if player is null to prevent errors
         float distanceToPlayer = player != null ? Vector3.Distance(transform.position, player.position) : Mathf.Infinity;
 
         if (distanceToPlayer <= attackRange)
         {
-            TryAttackPlayer(); 
+            // State 1: Attack (Highest Priority)
+            isAggro = true; 
+            TryAttackPlayer();
+        }
+        else if (isAggro)
+        {
+            // State 2: Relentless Chase / Revert
+            if (distanceToPlayer <= relentlessChaseRange)
+            {
+                // Player is still within the high chase limit
+                ChasePlayer();
+            }
+            else
+            {
+                // Player escaped the high range, revert to patrol
+                isAggro = false;
+                Wander();
+            }
         }
         else if (distanceToPlayer <= chaseRange)
         {
+            // State 3: Initial Aggro Detection (Start Chase)
+            isAggro = true; 
             ChasePlayer();
         }
         else
         {
+            // State 4: Default Wander
             Wander();
         }
 
@@ -97,9 +132,10 @@ public class BeastAI : MonoBehaviour, IDamageable
         UpdateAnimation();
     }
 
-    // --- Movement Logic: Replaces Patrol ---
+    // Movement Logic: Replaces Patrol
     void Wander()
     {
+        // This is only called if isAggro is false
         agent.isStopped = false;
         agent.speed = wanderSpeed;
 
@@ -128,25 +164,29 @@ public class BeastAI : MonoBehaviour, IDamageable
         }
     }
 
-    // --- Combat Logic ---
+    // Combat Logic
     void TryAttackPlayer()
     {
         agent.isStopped = true;
         agent.velocity = Vector3.zero;
 
-        // Face the player
+        // Face the player 
         Vector3 dir = (player.position - transform.position).normalized;
         if (dir.sqrMagnitude > 0.001f)
         {
             Quaternion targetRot = Quaternion.LookRotation(dir);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 10f);
+            // Use a higher rotation speed for a snappier look while attacking
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, Time.deltaTime * 10f); 
         }
 
         if (attackTimer >= attackCooldown)
         {
             attackTimer = 0f;
-            animator.SetTrigger("Attack");
-            animator.SetBool("IsWalking", false);
+            if (animator != null)
+            {
+                animator.SetTrigger(AnimParam_Attack);
+                animator.SetBool(AnimParam_IsWalking, false); 
+            }
             
             // DELAY DAMAGE APPLICATION to sync with animation impact
             Invoke(nameof(DealDamageToPlayer), attackDelay); 
@@ -171,11 +211,12 @@ public class BeastAI : MonoBehaviour, IDamageable
 
     void HandleRotation()
     {
+        // Only rotate if the agent is moving
         if (agent.velocity.sqrMagnitude > 0.1f && !agent.isStopped)
         {
             Vector3 direction = agent.velocity.normalized;
             Quaternion targetRotation = Quaternion.LookRotation(direction);
-            // Rotates the beast to face the direction of movement
+            // Rotates this GameObject to face the direction of movement
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
         }
     }
@@ -185,17 +226,25 @@ public class BeastAI : MonoBehaviour, IDamageable
         if (animator == null) return;
 
         float speed = agent.velocity.magnitude;
-        animator.SetFloat("Speed", speed);
-        animator.SetBool("IsWalking", speed > 0.1f && !agent.isStopped);
+        animator.SetFloat(AnimParam_Speed, speed);
+        animator.SetBool(AnimParam_IsWalking, speed > 0.1f && !agent.isStopped); 
     }
 
-    // --- IDamageable Implementation ---
+    // IDamageable Implementation
     public void TakeDamage(float damage)
     {
         if (isDead) return;
 
         currentHP -= damage;
         Debug.Log($"[Beast] -{damage}HP | Current HP: {currentHP}/{maxHP}");
+
+        // Any damage taken also causes immediate aggression, regardless of distance
+        if (!isAggro)
+        {
+            isAggro = true;
+            Debug.Log("[Beast] Damage taken! Aggro initiated.");
+        }
+
 
         if (currentHP <= 0)
         {
@@ -214,7 +263,8 @@ public class BeastAI : MonoBehaviour, IDamageable
         agent.isStopped = true;
         agent.velocity = Vector3.zero;
 
-        Collider col = GetComponent<Collider>();
+        // Collider is on this same GameObject (the root)
+        Collider col = GetComponent<Collider>(); 
         if (col != null)
         {
             col.enabled = false;
@@ -222,9 +272,10 @@ public class BeastAI : MonoBehaviour, IDamageable
 
         if (animator != null)
         {
-            animator.SetTrigger("Death");
+            animator.SetTrigger(AnimParam_Death);
         }
 
+        // Destroy this GameObject (the root object)
         Destroy(gameObject, deathDestroyDelay);
     }
 

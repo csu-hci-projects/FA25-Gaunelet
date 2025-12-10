@@ -5,10 +5,6 @@ public class SpellProjectile : MonoBehaviour
     // These values will be set by the CultAI script before the particle is launched
     public float damage = 0f;
     public string playerTag = "Player"; 
-    
-    // NOTE: This relies on the Particle System having Collision enabled 
-    // and "Send Collision Messages" checked in the Inspector.
-
 
     // Called when the particle collides with another object.
     private void OnParticleCollision(GameObject other)

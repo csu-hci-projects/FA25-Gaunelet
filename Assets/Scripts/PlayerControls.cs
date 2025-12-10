@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerControls : MonoBehaviour
@@ -21,7 +22,6 @@ public class PlayerControls : MonoBehaviour
     [Header("Rotation Settings")]
     public float rotationSmoothSpeed = 10f; // higher = faster rotation smoothing
     
-    // NEW: Plane used for raycasting mouse position
     private Plane groundPlane; 
     
     [Header("Gauntlet / Block Settings")]
@@ -69,6 +69,23 @@ public class PlayerControls : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Debug.Log("[PlayerControls] Escape key pressed. Returning to Title Screen (Scene 0).");
+            
+            // 1. Ensure the game time is resumed before loading the scene
+            // This prevents the new scene from starting in a paused state if Escape was pressed during a pause.
+            if (Time.timeScale != 1f)
+            {
+                Time.timeScale = 1f;
+                Debug.Log("[PlayerControls] Time scale reset to 1.0.");
+            }
+
+            // 2. Load the Title Screen (Scene Index 0 is the common convention)
+            SceneManager.LoadScene(0);
+            return; // Exit Update loop immediately after input is consumed
+        }
+
         // --- DEATH CHECK: Disable all input and rotation when dying ---
         if (playerState != null && playerState.IsDying())
         {

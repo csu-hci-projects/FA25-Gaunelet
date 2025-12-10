@@ -1,11 +1,9 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-/// <summary>
-/// Singleton class to manage the background music AudioSource.
-/// It ensures only one instance of the music player exists in the game, 
-/// and provides a simple interface to change the currently playing clip.
-/// </summary>
+// Singleton class to manage the background music AudioSource.
+// It ensures only one instance of the music player exists in the game, 
+// and provides a simple interface to change the currently playing clip.
 public class MusicManager : MonoBehaviour
 {
     // Static reference to the singleton instance
@@ -43,11 +41,7 @@ public class MusicManager : MonoBehaviour
         audioSource.volume = 0.5f;        // Default volume
     }
 
-    /// <summary>
-    /// Checks if the given audio clip is already playing.
-    /// </summary>
-    /// <param name="clip">The clip to check against.</param>
-    /// <returns>True if the clip is currently playing.</returns>
+    // Checks if the given audio clip is already playing.
     public bool IsClipPlaying(AudioClip clip)
     {
         if (audioSource.isPlaying && audioSource.clip == clip)
@@ -57,10 +51,7 @@ public class MusicManager : MonoBehaviour
         return false;
     }
 
-    /// <summary>
-    /// Stops the current music and starts playing a new clip.
-    /// </summary>
-    /// <param name="newClip">The AudioClip to start playing.</param>
+    // Stops the current music and starts playing a new clip.
     public void PlayMusic(AudioClip newClip)
     {
         if (newClip == null)
@@ -84,9 +75,7 @@ public class MusicManager : MonoBehaviour
         Debug.Log($"[MusicManager] Now playing: {newClip.name}");
     }
 
-    /// <summary>
-    /// Stops the music.
-    /// </summary>
+    // Stops the music.
     public void StopMusic()
     {
         if (audioSource.isPlaying)

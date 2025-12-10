@@ -96,9 +96,7 @@ public class LurkerAI : MonoBehaviour
         UpdateAnimation();
     }
 
-    /// <summary>
-    /// Stops the Lurker, makes it face the player, and deals proximity damage over time.
-    /// </summary>
+    // Stops the Lurker, makes it face the player, and deals proximity damage over time.
     void HandleProximityDamage()
     {
         // Stop moving instantly

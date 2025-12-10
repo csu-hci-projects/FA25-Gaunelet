@@ -1,10 +1,10 @@
 using UnityEngine;
 
-/// <summary>
-/// Controls the behavior of a Bramble Tile object's health.
-/// This script should be attached directly to the main Bramble object (which has the Collider and Rigidbody).
-/// It has health and ONLY takes damage if the player's currently active ability is Fire.
-/// </summary>
+
+// Controls the behavior of a Bramble Tile object's health.
+// This script should be attached directly to the main Bramble object (which has the Collider and Rigidbody).
+// It has health and ONLY takes damage if the player's currently active ability is Fire.
+
 public class Bramble : MonoBehaviour, IDamageable
 {
     [Header("Bramble Health")]
@@ -37,25 +37,22 @@ public class Bramble : MonoBehaviour, IDamageable
         }
     }
 
-    /// <summary>
-    /// Reduces the bramble tile's health and checks for destruction.
-    /// This method is called by ParticleDamage.cs via the IDamageable interface.
-    /// </summary>
-    /// <param name="damage">The amount of damage to take.</param>
+ 
+    // Reduces the bramble tile's health and checks for destruction.
+    // This method is called by ParticleDamage.cs via the IDamageable interface.
     public void TakeDamage(float damage)
     {
         if (currentHealth <= 0) return; // Already destroyed
 
-        // --- NEW DAMAGE FILTER CHECK ---
+        // NEW DAMAGE FILTER CHECK
         if (damage >= damageIgnoreThreshold)
         {
             // Block high-value damage (e.g., sword swing) regardless of element
             Debug.Log($"[Bramble Tile] Damage of {damage:F2} ignored. It exceeded the threshold of {damageIgnoreThreshold:F2} (likely a physical attack).");
             return;
         }
-        // -------------------------------
         
-        // --- ELEMENTAL CHECK ---
+        // ELEMENTAL CHECK
         // Only take damage if the player is currently casting Fire.
         if (!IsPlayerCastingFire())
         {
@@ -76,9 +73,8 @@ public class Bramble : MonoBehaviour, IDamageable
         }
     }
 
-    /// <summary>
-    /// Checks if the player's currently active ability is Fire using the GauntletAbilities reference.
-    /// </summary>
+
+    // Checks if the player's currently active ability is Fire using the GauntletAbilities reference.
     private bool IsPlayerCastingFire()
     {
         if (playerAbilities == null)
@@ -93,9 +89,8 @@ public class Bramble : MonoBehaviour, IDamageable
         return playerAbilities.GetCurrentAbility() == AbilityType.Fire;
     }
 
-    /// <summary>
-    /// Implements the IDamageable interface. Returns true if health is above zero.
-    /// </summary>
+
+    // Implements the IDamageable interface. Returns true if health is above zero.
     public bool IsAlive()
     {
         return currentHealth > 0;

@@ -1,10 +1,7 @@
 using UnityEngine;
 
-/// <summary>
-/// Spawns a single GameObject prefab (the sign) at a specified Transform location 
-/// when the player presses the activation key inside the trigger volume.
-/// The spawned sign must have a 'SignReader.cs' component attached to handle interaction and UI.
-/// </summary>
+// Spawns a single GameObject prefab (the sign) at a specified Transform location 
+// when the player presses the activation key inside the trigger volume.
 [RequireComponent(typeof(BoxCollider))] // Requires a Collider for the trigger area
 public class SpawnOnKeyPress : MonoBehaviour
 {
@@ -69,9 +66,7 @@ public class SpawnOnKeyPress : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Instantiates the item. The spawned sign is now responsible for handling its own message display.
-    /// </summary>
+    // Instantiates the item. The spawned sign is now responsible for handling its own message display.
     private void ActivateSpawn()
     {
         if (hasBeenActivated) return;
